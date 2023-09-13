@@ -1,0 +1,17 @@
+inherited frmTImageViewer: TfrmTImageViewer
+  DesignerMasterStyle = 0
+  inherited rctContent: TRectangle
+    inherited sbxContent: TScrollBox
+      Viewport.Width = 360.000000000000000000
+      Viewport.Height = 523.000000000000000000
+      object imgImage: TImage
+        MultiResBitmap = <
+          item
+          end>
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+      end
+    end
+  end
+end

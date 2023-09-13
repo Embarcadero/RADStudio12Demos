@@ -1,0 +1,17 @@
+inherited frmControlViewer: TfrmControlViewer
+  DesignerMasterStyle = 0
+  inherited rctContent: TRectangle
+    inherited rctHeader: TRectangle
+      inherited lblTitle: TSkLabel
+        Words = <
+          item
+            Text = 'Control Viewer'
+          end>
+      end
+    end
+    inherited sbxContent: TScrollBox
+      Viewport.Width = 360.000000000000000000
+      Viewport.Height = 523.000000000000000000
+    end
+  end
+end

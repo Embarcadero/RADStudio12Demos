@@ -1,0 +1,27 @@
+inherited frmPaintBoxViewer: TfrmPaintBoxViewer
+  DesignerMasterStyle = 0
+  inherited rctContent: TRectangle
+    inherited rctHeader: TRectangle
+      inherited lblTitle: TSkLabel
+        Words = <
+          item
+            Text = 'PaintBox Viewer'
+          end>
+      end
+    end
+    inherited sbxContent: TScrollBox
+      Viewport.Width = 360.000000000000000000
+      Viewport.Height = 523.000000000000000000
+      object pbxDraw: TSkPaintBox
+        HitTest = True
+        Size.Width = 50.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+        OnMouseDown = pbxDrawMouseDown
+        OnMouseMove = pbxDrawMouseMove
+        OnMouseUp = pbxDrawMouseUp
+        OnDraw = pbxDrawDraw
+      end
+    end
+  end
+end

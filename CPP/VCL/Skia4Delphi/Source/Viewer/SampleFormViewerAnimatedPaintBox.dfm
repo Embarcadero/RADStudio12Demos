@@ -1,0 +1,28 @@
+inherited frmAnimatedPaintBoxViewer: TfrmAnimatedPaintBoxViewer
+  ClientHeight = 579
+  TextHeight = 15
+  inherited pnlContent: TPanel
+    Height = 579
+    inherited pnlTitle: TPanel
+      inherited lblTitle: TSkLabel
+        Words = <
+          item
+            Caption = 'PaintBox Viewer'
+          end>
+      end
+    end
+    inherited sbxContent: TScrollBox
+      OnMouseMove = apbDrawMouseMove
+      object apbDraw: TSkAnimatedPaintBox
+        Left = 0
+        Top = 0
+        Width = 50
+        Height = 50
+        OnMouseMove = apbDrawMouseMove
+        Animation.Duration = 100000.000000000000000000
+        Animation.Enabled = False
+        OnAnimationDraw = apbDrawAnimationDraw
+      end
+    end
+  end
+end

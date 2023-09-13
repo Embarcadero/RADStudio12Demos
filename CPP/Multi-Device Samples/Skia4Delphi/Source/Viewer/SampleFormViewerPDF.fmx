@@ -1,0 +1,24 @@
+inherited frmPDFViewer: TfrmPDFViewer
+  DesignerMasterStyle = 0
+  inherited rctContent: TRectangle
+    inherited rctHeader: TRectangle
+      inherited lblTitle: TSkLabel
+        Words = <
+          item
+            Text = 'PDF Viewer'
+          end>
+      end
+    end
+    inherited sbxContent: TScrollBox
+      Viewport.Width = 360.000000000000000000
+      Viewport.Height = 523.000000000000000000
+      object wbrBrowser: TWebBrowser
+        Align = Client
+        Size.Width = 360.000000000000000000
+        Size.Height = 523.000000000000000000
+        Size.PlatformDefault = False
+        WindowsEngine = IEOnly
+      end
+    end
+  end
+end
