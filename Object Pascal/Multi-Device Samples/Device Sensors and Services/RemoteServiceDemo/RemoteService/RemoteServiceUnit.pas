@@ -16,19 +16,12 @@ unit RemoteServiceUnit;
 interface
 
 uses
-  System.SysUtils,
-  System.Classes,
-  System.Android.Service,
-  AndroidApi.JNI.GraphicsContentViewText,
-  Androidapi.JNI.Os;
+  System.SysUtils, System.Classes, System.Android.Service,
+  AndroidApi.JNI.GraphicsContentViewText, Androidapi.JNI.Os;
 
 type
   TRemoteServiceDM = class(TAndroidService)
     function AndroidServiceHandleMessage(const Sender: TObject; const AMessage: JMessage): Boolean;
-  private
-    { Private declarations }
-  public
-    { Public declarations }
   end;
 
 var

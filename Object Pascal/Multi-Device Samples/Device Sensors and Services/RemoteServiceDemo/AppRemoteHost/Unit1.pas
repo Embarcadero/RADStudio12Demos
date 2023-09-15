@@ -16,18 +16,12 @@ unit Unit1;
 interface
 
 uses
-  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls,
-  FMX.Controls.Presentation, System.Android.Service, Androidapi.JNI.Os;
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants, System.Android.Service,
+  Androidapi.JNI.Os,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls, FMX.Controls.Presentation;
 
 type
   TForm1 = class(TForm)
-  private
-    FServiceConnection: TRemoteServiceConnection;
-
-    procedure OnServiceConnected(const ServiceMessenger: JMessenger);
-    procedure OnHandleMessage(const AMessage: JMessage);
-  published
     LabelHeader: TLabel;
     PanelBind: TPanel;
     ButtonBind: TButton;
@@ -41,6 +35,11 @@ type
     procedure ButtonBindClick(Sender: TObject);
     procedure ButtonUnbindClick(Sender: TObject);
     procedure ButtonGetDataClick(Sender: TObject);
+  private
+    FServiceConnection: TRemoteServiceConnection;
+
+    procedure OnServiceConnected(const ServiceMessenger: JMessenger);
+    procedure OnHandleMessage(const AMessage: JMessage);
   end;
 
 var
@@ -51,9 +50,7 @@ implementation
 {$R *.fmx}
 
 uses
-  AndroidApi.Helpers,
-  Androidapi.JNI.JavaTypes,
-  Androidapi.JNI.Widget;
+  AndroidApi.Helpers, Androidapi.JNI.JavaTypes, Androidapi.JNI.Widget;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
