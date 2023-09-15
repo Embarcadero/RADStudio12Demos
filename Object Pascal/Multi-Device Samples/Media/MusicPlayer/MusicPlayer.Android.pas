@@ -17,7 +17,7 @@ uses
   FMX.Graphics,
   MusicPlayer.Utils,
   System.IoUtils, System.SysUtils, System.Classes,
-  FMX.Types, FMX.Platform.Android,
+  FMX.Types, FMX.Platform.Android, FMX.Helpers.Android,
   Androidapi.JNI.Os, Androidapi.JNI.Net,
   Androidapi.JNIBridge, Androidapi.JNI.JavaTypes, Androidapi.JNI.GraphicsContentViewText,
   Androidapi.JNI.Media, Androidapi.JNI.Provider, Androidapi.Helpers, Androidapi.JNI.App;
@@ -105,17 +105,20 @@ begin
 end;
 
 function TMusicPlayer.CanSkipForward: Boolean;
+var
+  Len: Integer;
 begin
   Result := False;
-  if (Length(FPlaylist) = 0) or not (FPlayBackState in [TMPPlaybackState.Playing, TMPPlaybackState.Paused]) then
+  Len := Length(FPlaylist);
+  if (Len = 0) or not (FPlayBackState in [TMPPlaybackState.Playing, TMPPlaybackState.Paused]) then
     Exit(Result);
 
   case RepeatMode of
     TMPRepeatMode.One:
-      Result := FCurrentIndex in [Low(FPlaylist) .. High(FPlaylist)] ;
+      Result := (FCurrentIndex >= 0) and (FCurrentIndex < Len);
     TMPRepeatMode.Default,
     TMPRepeatMode.None:
-      Result := FCurrentIndex in [Low(FPlaylist) .. High(FPlaylist)-1] ;
+      Result := (FCurrentIndex >= 0) and (FCurrentIndex < Len - 1);
     TMPRepeatMode.All:
       Result := True;
   end;
@@ -164,51 +167,57 @@ end;
 
 function TMusicPlayer.GetAlbums: TArray<string>;
 var
-  projection: TJavaObjectArray<JString>;
-  cursor: JCursor;
-  artPath: String;
-  tmpPath: String;
+  Projection: TJavaObjectArray<JString>;
+  Cursor: JCursor;
+  ArtPath: String;
+  TmpPath: String;
 begin
-  projection := TJavaObjectArray<JString>.Create(4);
-  projection.Items[0] := TJAudio_AlbumColumns.JavaClass.ALBUM;
-  projection.Items[1] := TJAudio_AlbumColumns.JavaClass.ARTIST;
-  projection.Items[2] := StringToJString('_id');
-  projection.Items[3] := TJAudio_AlbumColumns.JavaClass.ALBUM_ART;
+  Projection := CreateJavaStringArray([TJAudio_AlbumColumns.JavaClass.ALBUM, TJAudio_AlbumColumns.JavaClass.ARTIST, '_id',
+    TJAudio_AlbumColumns.JavaClass.ALBUM_ART]);
 
-  cursor := MainActivity.getContentResolver.query(
-    TJAudio_Albums.JavaClass.EXTERNAL_CONTENT_URI,
-    projection,
-    nil,
-    nil,
-    nil);
+  try
+    Cursor := TAndroidHelper.ContentResolver.query(TJAudio_Albums.JavaClass.EXTERNAL_CONTENT_URI, Projection, nil, nil, nil);
 
-  SetLength(Result, cursor.getCount);
-  SetLength(FAlbums, cursor.getCount + 1);
-  FAlbums[cursor.getCount] := TMPAlbum.AllMusicAlbum;
-  while (cursor.moveToNext) do
-  begin
-    FAlbums[cursor.getPosition].Name := JStringToString(cursor.getString(0));
-    FAlbums[cursor.getPosition].Artist := JStringToString(cursor.getString(1));
-    FAlbums[cursor.getPosition].Album_ID := cursor.getInt(2);
-
-    artPath := JStringToString(cursor.getString(3));
-    if TFile.Exists(artPath) then
-    begin
+    if Cursor <> nil then
       try
-        //Workaround for loading problems: copy to a file with correct extension.
-        tmpPath := System.IOUtils.TPath.Combine(System.IOUtils.TPath.GetDocumentsPath,  'tmp.jpg');
-        TFile.Copy(artPath, tmpPath);
-        FAlbums[cursor.getPosition].Artwork := TBitmap.CreateFromFile(tmpPath);
-        TFile.Delete(tmpPath);
-      except
-      end;
-    end
-    else
-      FAlbums[cursor.getPosition].Artwork := FDefaultAlbumImage;
+        SetLength(Result, Cursor.getCount);
+        SetLength(FAlbums, Cursor.getCount + 1);
 
-    Result[cursor.getPosition] := FAlbums[cursor.getPosition].Name;
+        FAlbums[Cursor.getCount] := TMPAlbum.AllMusicAlbum;
+
+        while Cursor.moveToNext do
+        begin
+          FAlbums[Cursor.getPosition].Name := JStringToString(Cursor.getString(0));
+          FAlbums[Cursor.getPosition].Artist := JStringToString(Cursor.getString(1));
+          FAlbums[Cursor.getPosition].Album_ID := Cursor.getInt(2);
+
+          ArtPath := JStringToString(Cursor.getString(3));
+
+          if TFile.Exists(ArtPath) then
+          begin
+            try
+              //Workaround for loading problems: copy to a file with correct extension.
+              TmpPath := System.IOUtils.TPath.Combine(System.IOUtils.TPath.GetDocumentsPath,  'tmp.jpg');
+
+              TFile.Copy(ArtPath, TmpPath);
+
+              FAlbums[Cursor.getPosition].Artwork := TBitmap.CreateFromFile(TmpPath);
+
+              TFile.Delete(TmpPath);
+            except
+            end;
+          end
+          else
+            FAlbums[Cursor.getPosition].Artwork := FDefaultAlbumImage;
+
+          Result[Cursor.getPosition] := FAlbums[Cursor.getPosition].Name;
+        end;
+      finally
+        Cursor.close;
+      end;
+  finally
+    Projection.Free;
   end;
-  cursor.close;
 end;
 
 function TMusicPlayer.GetDuration: Single;
@@ -233,42 +242,42 @@ end;
 
 function TMusicPlayer.GetSongs: TArray<string>;
 var
-  projection: TJavaObjectArray<JString>;
-  cursor: JCursor;
-  selection: JString;
+  Selection: JString;
+  Projection: TJavaObjectArray<JString>;
+  Cursor: JCursor;
 begin
-  selection := StringToJString(JStringToString(TJAudio_AudioColumns.JavaClass.IS_MUSIC) + ' != 0');
+  Selection := StringToJString(JStringToString(TJAudio_AudioColumns.JavaClass.IS_MUSIC) + ' != 0');
 
-  projection := TJavaObjectArray<JString>.Create(5);
+  Projection := CreateJavaStringArray([TJAudio_AudioColumns.JavaClass.ARTIST, 'title', '_data', TJAudio_AudioColumns.JavaClass.ALBUM,
+    TJAudio_AudioColumns.JavaClass.DURATION]);
 
-  projection.Items[0] := TJAudio_AudioColumns.JavaClass.ARTIST;
-  projection.Items[1] := StringToJString('title');
-  projection.Items[2] := StringToJString('_data');
-  projection.Items[3] := TJAudio_AudioColumns.JavaClass.ALBUM;
-  projection.Items[4] := TJAudio_AudioColumns.JavaClass.DURATION;
+  try
+    Cursor := TAndroidHelper.ContentResolver.query(TJAudio_Media.JavaClass.EXTERNAL_CONTENT_URI, Projection, Selection, nil, nil);
 
-  cursor := MainActivity.getContentResolver.query(
-    TJAudio_Media.JavaClass.EXTERNAL_CONTENT_URI,
-    projection,
-    selection,
-    nil,
-    nil);
+    if Cursor <> nil then
+      try
+        SetLength(Result, Cursor.getCount);
+        SetLength(FPlaylist, Cursor.getCount);
 
-  SetLength(Result,cursor.getCount);
-  SetLength(FPlaylist, cursor.getCount);
-  while (cursor.moveToNext) do
-  begin
-    FPlaylist[cursor.getPosition] := TMPSong.FromCursor(cursor);
-    Result[cursor.getPosition] := Format('[%s]-[%s]', [FPlaylist[cursor.getPosition].Artist, FPlaylist[cursor.getPosition].Title]);
+        while Cursor.moveToNext do
+        begin
+          FPlaylist[Cursor.getPosition] := TMPSong.FromCursor(Cursor);
+          Result[Cursor.getPosition] := Format('[%s]-[%s]', [FPlaylist[Cursor.getPosition].Artist, FPlaylist[Cursor.getPosition].Title]);
+        end;
+      finally
+        Cursor.close;
+      end;
+  finally
+    Projection.Free;
   end;
-  cursor.close;
 end;
 
 function TMusicPlayer.GetSongsInAlbum(AName: string): TArray<string>;
 var
-  projection: TJavaObjectArray<JString>;
-  cursor: JCursor;
-  selection: JString;
+  Selection: JString;
+  Projection: TJavaObjectArray<JString>;
+  SelectionArgs: TJavaObjectArray<JString>;
+  Cursor: JCursor;
 begin
   if AName = TMPAlbum.AllMusicAlbum.Name then
   begin
@@ -276,32 +285,37 @@ begin
     Exit;
   end;
 
-  selection := StringToJString(JStringToString(TJAudio_AudioColumns.JavaClass.IS_MUSIC) + ' != 0 and ' +
-      JStringToString(TJAudio_AudioColumns.JavaClass.ALBUM) + ' = "' + AName + '"');
+  Selection := StringToJString(JStringToString(TJAudio_AudioColumns.JavaClass.IS_MUSIC) + ' != 0 and ' +
+    JStringToString(TJAudio_AudioColumns.JavaClass.ALBUM) + ' = ?');
 
-  projection := TJavaObjectArray<JString>.Create(5);
+  Projection := CreateJavaStringArray([TJAudio_AudioColumns.JavaClass.ARTIST, 'title', '_data', TJAudio_AudioColumns.JavaClass.ALBUM,
+    TJAudio_AudioColumns.JavaClass.DURATION]);
 
-  projection.Items[0] := TJAudio_AudioColumns.JavaClass.ARTIST;
-  projection.Items[1] := StringToJString('title');
-  projection.Items[2] := StringToJString('_data');
-  projection.Items[3] := TJAudio_AudioColumns.JavaClass.ALBUM;
-  projection.Items[4] := TJAudio_AudioColumns.JavaClass.DURATION;
+  try
+    SelectionArgs := CreateJavaStringArray([AName]);
 
-  cursor := MainActivity.getContentResolver.query(
-    TJAudio_Media.JavaClass.EXTERNAL_CONTENT_URI,
-    projection,
-    selection,
-    nil,
-    nil);
+    try
+      Cursor := TAndroidHelper.ContentResolver.query(TJAudio_Media.JavaClass.EXTERNAL_CONTENT_URI, Projection, Selection, SelectionArgs, nil);
 
-  SetLength(Result,cursor.getCount);
-  SetLength(FPlaylist, cursor.getCount);
-  while (cursor.moveToNext) do
-  begin
-    FPlaylist[cursor.getPosition] := TMPSong.FromCursor(cursor);
-    Result[cursor.getPosition] := Format('[%s]-[%s]', [FPlaylist[cursor.getPosition].Artist, FPlaylist[cursor.getPosition].Title]);
+      if Cursor <> nil then
+        try
+          SetLength(Result, Cursor.getCount);
+          SetLength(FPlaylist, Cursor.getCount);
+
+          while Cursor.moveToNext do
+          begin
+            FPlaylist[Cursor.getPosition] := TMPSong.FromCursor(Cursor);
+            Result[Cursor.getPosition] := Format('[%s]-[%s]', [FPlaylist[Cursor.getPosition].Artist, FPlaylist[Cursor.getPosition].Title]);
+          end;
+        finally
+          Cursor.close;
+        end;
+    finally
+      SelectionArgs.Free;
+    end;
+  finally
+    Projection.Free
   end;
-  cursor.close;
 end;
 
 function TMusicPlayer.GetTime: Single;

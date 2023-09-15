@@ -88,10 +88,8 @@ type
     procedure btnCloseSettingsClick(Sender: TObject);
   private
 {$IFDEF ANDROID}
-    FPermissionReadExternalStorage: string;
-
     procedure DisplayRationale(Sender: TObject; const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc);
-    procedure ReadStoragePermissionRequestResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
+    procedure StoragePermissionRequestResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
 {$ENDIF}
 {$IFDEF IOS}
     procedure RequestMediaLibraryAccessHandler(Status: MPMediaLibraryAuthorizationStatus);
@@ -120,6 +118,8 @@ uses
 {$R *.fmx}
 
 procedure TFMXMusicPlayerFrm.FormCreate(Sender: TObject);
+var
+  StoragePermission: string;
 begin
   TMusicPlayer.DefaultPlayer.OnSongChange := SongChanged;
   TMusicPlayer.DefaultPlayer.OnProcessPlay := DoUpdateUI;
@@ -127,8 +127,12 @@ begin
 {$IFDEF ANDROID}
   tcUITabs.TabPosition := TTabPosition.Top;
 
-  FPermissionReadExternalStorage := JStringToString(TJManifest_permission.JavaClass.READ_EXTERNAL_STORAGE);
-  PermissionsService.RequestPermissions([FPermissionReadExternalStorage], ReadStoragePermissionRequestResult, DisplayRationale);
+  if TOSVersion.Check(13) then
+    StoragePermission := JStringToString(TJManifest_permission.JavaClass.READ_MEDIA_AUDIO)
+  else
+    StoragePermission := JStringToString(TJManifest_permission.JavaClass.READ_EXTERNAL_STORAGE);
+
+  PermissionsService.RequestPermissions([StoragePermission], StoragePermissionRequestResult, DisplayRationale);
 {$ENDIF}
 {$IFDEF IOS}
   TMPMediaLibrary.OCClass.requestAuthorization(RequestMediaLibraryAccessHandler);
@@ -214,13 +218,13 @@ begin
     end);
 end;
 
-procedure TFMXMusicPlayerFrm.ReadStoragePermissionRequestResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
+procedure TFMXMusicPlayerFrm.StoragePermissionRequestResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
 begin
-  // 1 permission involved: READ_EXTERNAL_STORAGE
+  // 1 permission involved: READ_MEDIA_AUDIO or READ_EXTERNAL_STORAGE
   if (Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted) then
     QuerySongs
   else
-    TDialogService.ShowMessage('Cannot list out the song files because the required permission is not granted');
+    TDialogService.ShowMessage('Cannot list out the song files because the required permission has not been granted');
 end;
 {$ENDIF}
 
@@ -233,7 +237,7 @@ begin
       if Status = MPMediaLibraryAuthorizationStatusAuthorized then
         QuerySongs
       else
-        TDialogService.ShowMessage('Cannot list out the song files because the required permission is not granted');
+        TDialogService.ShowMessage('Cannot list out the song files because the required permission has not been granted');
     end);
 end;
 {$ENDIF}
@@ -246,7 +250,7 @@ begin
   TMusicPlayer.DefaultPlayer.GetAlbums;
   TMusicPlayer.DefaultPlayer.GetSongs;
 
-  if Length(TMusicPlayer.DefaultPlayer.Albums) >= 2 then
+  if Length(TMusicPlayer.DefaultPlayer.Albums) > 1 then
   begin
     lvAlbums.BeginUpdate;
 
