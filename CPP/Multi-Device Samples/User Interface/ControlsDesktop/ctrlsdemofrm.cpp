@@ -14,17 +14,14 @@
 
 #include "ctrlsdemofrm.h"
 #include <memory>
+#include <ctime>
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.fmx"
 
-long rndm(long max)
+long rndm(int max)
 {
-#ifdef __APPLE__
-	return (random() % ((max + 1) + max));
-#else
-	return random(max);
-#endif
+    return std::rand() % max;
 }
 
 TfrmCtrlsDemo *frmCtrlsDemo;
@@ -256,20 +253,21 @@ void __fastcall TfrmCtrlsDemo::CheckBox8Change(TObject *Sender)
 
 void __fastcall TfrmCtrlsDemo::FormCreate(TObject *Sender)
 {
-  int i;
-  for (i=0; i < 50; i++) {
-	  TRectangle *ARect = new TRectangle(frmCtrlsDemo);
-	  ARect->Parent= ScrollBox1;
-	  ARect->Width = (30 + rndm(150));
-	  ARect->Height = (30 + rndm(150));
-	  ARect->HitTest = false;
-	  ARect->Position->X = rndm(1600);
-	  ARect->Position->Y = rndm(1600);
-	  ARect->XRadius = rndm(20);
-	  ARect->YRadius = ARect->XRadius;
-	  ARect->Fill->Color = ((50 + rndm(205)) << 24) | rndm(0xFFFFFF);
-  }
+    std::srand(std::time(0));
 
+    for (int i = 0; i < 50; i++)
+    {
+        TRectangle *ARect = new TRectangle(frmCtrlsDemo);
+        ARect->Parent= ScrollBox1;
+        ARect->Width = (30 + rndm(150));
+        ARect->Height = (30 + rndm(150));
+        ARect->HitTest = false;
+        ARect->Position->X = rndm(1600);
+        ARect->Position->Y = rndm(1600);
+        ARect->XRadius = rndm(20);
+        ARect->YRadius = ARect->XRadius;
+        ARect->Fill->Color = ((50 + rndm(205)) << 24) | rndm(0xFFFFFF);
+    }
 }
 //---------------------------------------------------------------------------
 
