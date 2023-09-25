@@ -114,6 +114,7 @@ object Form1: TForm1
           TabOrder = 5
           Text = 'Add Photo'
           object btnLoadPicture: TButton
+            Action = TakePhotoFromLibraryAction1
             Align = Right
             Margins.Right = 3.000000000000000000
             Position.X = 513.000000000000000000
@@ -122,8 +123,6 @@ object Form1: TForm1
             Size.PlatformDefault = False
             StyleLookup = 'organizetoolbuttonbordered'
             TabOrder = 0
-            Text = 'Photo Library'
-            OnClick = btnLoadPictureClick
           end
           object Image1: TImage
             MultiResBitmap = <

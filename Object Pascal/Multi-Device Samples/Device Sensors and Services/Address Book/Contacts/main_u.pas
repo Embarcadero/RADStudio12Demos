@@ -88,27 +88,19 @@ type
     procedure TakePhotoFromLibraryAction1DidFinishTaking(Image: TBitmap);
     procedure TakePhotoFromCameraAction1DidFinishTaking(Image: TBitmap);
     procedure btnTakePictureClick(Sender: TObject);
-    procedure btnLoadPictureClick(Sender: TObject);
   private
     { Private declarations }
     FDefaultSource: TAddressBookSource;
     FGroups: TAddressBookGroups;
-    FPermissionReadContacts,
-    FPermissionWriteContacts,
-    FPermissionCamera,
-    FPermissionReadExternalStorage,
-    FPermissionWriteExternalStorage: string;
     procedure FillGroupComboBox(const AGroups: TAddressBookGroups;
       const AComboBox: TComboBox);
     procedure FillGroupList(Source: TAddressBookSource);
     procedure FillContactList(Source: TAddressBookSource);
     procedure AddListViewItem(Contact: TAddressBookContact);
-    function ContactExists(ID: Integer): Boolean;
     procedure DeleteContact(const AKey: TModalResult);
     procedure ClearAddContactForm;
     procedure DisplayRationale(Sender: TObject; const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc);
     procedure TakePicturePermissionRequestResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
-    procedure LoadPicturePermissionRequestResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
   end;
 
 var
@@ -163,16 +155,17 @@ begin
   ClearAddContactForm;
 end;
 
-procedure TForm1.btnLoadPictureClick(Sender: TObject);
-begin
-  PermissionsService.RequestPermissions(
-    [FPermissionReadExternalStorage], LoadPicturePermissionRequestResult, DisplayRationale)
-end;
-
 procedure TForm1.btnTakePictureClick(Sender: TObject);
+var
+  StoragePermission: string;
 begin
-  PermissionsService.RequestPermissions(
-    [FPermissionCamera, FPermissionReadExternalStorage, FPermissionWriteExternalStorage], TakePicturePermissionRequestResult, DisplayRationale)
+  if TOSVersion.Check(11) then
+    TakePhotoFromCameraAction1.Execute
+  else
+  begin
+    StoragePermission := JStringToString(TJManifest_permission.JavaClass.WRITE_EXTERNAL_STORAGE);
+    PermissionsService.RequestPermissions([StoragePermission], TakePicturePermissionRequestResult);
+  end;
 end;
 
 // --------------------------------------------------------------------
@@ -191,16 +184,12 @@ begin
       ContactID := ListViewContacts.Items[ContactIndex].Tag;
       Contact := AddressBook1.ContactByID(ContactID);
       try
-        AddressBook1.RemoveContact(Contact);
         try
-          ListViewContacts.BeginUpdate;
-          // Check if the contact was really deleted
-          if not ContactExists(ContactID) then
-            ListViewContacts.Items.Delete(ContactIndex)
-          else
-            ShowMessage('Cannot delete this contact: ' + Contact.DisplayName);
-        finally
-          ListViewContacts.EndUpdate;
+          AddressBook1.RemoveContact(Contact);
+          ListViewContacts.Items.Delete(ContactIndex);
+        except
+          on E: EAddressBookException do
+            ShowMessage('Cannot delete the contact');
         end;
       finally
         Contact.Free;
@@ -211,27 +200,10 @@ end;
 
 // Optional rationale display routine to display permission requirement rationale to the user
 procedure TForm1.DisplayRationale(Sender: TObject; const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc);
-var
-  I: Integer;
-  RationaleMsg: string;
 begin
-  for I := 0 to Pred(Length(APermissions)) do
-  begin
-    if APermissions[I] = FPermissionReadContacts then
-      RationaleMsg := RationaleMsg + 'The app needs to look in the address book'
-    else if APermissions[I] = FPermissionWriteContacts then
-      RationaleMsg := RationaleMsg + 'The app needs to update the address book'
-    else if APermissions[I] = FPermissionCamera then
-      RationaleMsg := RationaleMsg + 'The app needs to access the camera to take a photo for your new contact'
-    else if APermissions[I] = FPermissionReadExternalStorage then
-      RationaleMsg := RationaleMsg + 'The app needs to read a photo file from your device to associate with your new contact';
-    if I <> Pred(Length(APermissions)) then
-      RationaleMsg := RationaleMsg + SLineBreak + SLineBreak;
-  end;
-
   // Show an explanation to the user *asynchronously* - don't block this thread waiting for the user's response!
   // After the user sees the explanation, invoke the post-rationale routine to request the permissions
-  TDialogService.ShowMessage(RationaleMsg,
+  TDialogService.ShowMessage('The application needs to have access to the address book',
     procedure(const AResult: TModalResult)
     begin
       APostRationaleProc
@@ -246,36 +218,17 @@ begin
     ShowMessage('Loading contacts...')
   else
     ShowMessage('This platform does not support the Address Book service');
-{$IFDEF ANDROID}
-  FPermissionReadContacts := JStringToString(TJManifest_permission.JavaClass.READ_CONTACTS);
-  FPermissionWriteContacts := JStringToString(TJManifest_permission.JavaClass.WRITE_CONTACTS);
-  FPermissionCamera := JStringToString(TJManifest_permission.JavaClass.CAMERA);
-  FPermissionReadExternalStorage := JStringToString(TJManifest_permission.JavaClass.READ_EXTERNAL_STORAGE);
-  FPermissionWriteExternalStorage := JStringToString(TJManifest_permission.JavaClass.WRITE_EXTERNAL_STORAGE);
-{$ENDIF}
   AddressBook1.RequestPermission(DisplayRationale);
   TabControl1.ActiveTab := TabItemContacts;
 end;
 
 procedure TForm1.TakePicturePermissionRequestResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
 begin
-  // 3 permissions involved: CAMERA, READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE
-  if (Length(AGrantResults) = 3) and
-     (AGrantResults[0] = TPermissionStatus.Granted) and
-     (AGrantResults[1] = TPermissionStatus.Granted) and
-     (AGrantResults[2] = TPermissionStatus.Granted) then
+  // 1 permission involved: WRITE_EXTERNAL_STORAGE
+  if (Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted) then
     TakePhotoFromCameraAction1.Execute
   else
-    ShowMessage('Cannot take a photo because the required permissions are not all granted')
-end;
-
-procedure TForm1.LoadPicturePermissionRequestResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
-begin
-  // 1 permission involved: CAMERA
-  if (Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted) then
-    TakePhotoFromLibraryAction1.Execute
-  else
-    ShowMessage('Cannot load a photo because the READ_EXTERNAL_STORAGE permission has been denied')
+    ShowMessage('Cannot take a photo because the required permission has not been granted')
 end;
 
 procedure TForm1.TakePhotoFromCameraAction1DidFinishTaking(Image: TBitmap);
@@ -320,61 +273,59 @@ end;
 procedure TForm1.ActionAddContactExecute(Sender: TObject);
 var
   Contact: TAddressBookContact;
-  eMails: TContactEmails;
   Photo: TBitmapSurface;
+  eMails: TContactEmails;
 begin
-  Contact := AddressBook1.CreateContact(FDefaultSource);
+  Contact := nil;
+  Photo := nil;
+  eMails := nil;
+
   try
     try
+      Contact := AddressBook1.CreateContact(FDefaultSource);
       Contact.FirstName := edtFirstName.Text;
       Contact.LastName := edtLastName.Text;
-      if not Image1.Bitmap.Size.IsZero then
+
+      if not Image1.Bitmap.IsEmpty then
       begin
         Photo := TBitmapSurface.Create;
-        try
-          Photo.Assign(Image1.Bitmap);
-          Contact.Photo := Photo;
-          Image1.Bitmap.SetSize(0, 0);
-        finally
-          Photo.Free;
-        end;
+        Photo.Assign(Image1.Bitmap);
+        Contact.Photo := Photo;
+        Image1.Bitmap.SetSize(0, 0);
       end;
+
       // Add the work mail
       eMails := TContactEmails.Create;
-      try
-        eMails.AddEmail(TContactEmail.TLabelKind.Work, edtWorkMail.Text);
-        Contact.eMails := eMails;
-      finally
-        eMails.Free;
-      end;
+      eMails.AddEmail(TContactEmail.TLabelKind.Work, edtWorkMail.Text);
+      Contact.eMails := eMails;
+
       // Save a newly created contact to Address Book
       AddressBook1.SaveContact(Contact);
-
     except
       on E: EAddressBookException do
-        ShowMessage('Cannot create the contact.' + E.Message);
+      begin
+        ShowMessage('Cannot add the contact');
+        Exit;
+      end;
     end;
 
-    // Add the contact to the selected group, if any
     try
+      // Add the contact to the selected group, if any
       if InRange(ComboBox1.ItemIndex, 0, FGroups.Count - 1) then
-        AddressBook1.AddContactIntoGroup
-          (FGroups.Items[ComboBox1.ItemIndex], Contact);
+        AddressBook1.AddContactIntoGroup(FGroups.Items[ComboBox1.ItemIndex], Contact);
+
+      AddListViewItem(Contact);
+      TabControl1.ActiveTab := TabItemContacts;
     except
       on E: EAddressBookException do
-        ShowMessage('Cannot add the newly created contact to group.' + E.Message);
+        ShowMessage('Cannot add the contact into the group');
     end;
-
-    ListViewContacts.BeginUpdate;
-    try
-      AddListViewItem(Contact);
-    finally
-      ListViewContacts.EndUpdate;
-    end;
-    TabControl1.ActiveTab := TabItemContacts;
   finally
     Contact.Free;
+    Photo.Free;
+    eMails.Free;
   end;
+
   // Clear the Add Contact Form
   ClearAddContactForm;
 end;
@@ -384,18 +335,20 @@ procedure TForm1.ActionAddGroupExecute(Sender: TObject);
 var
   Group: TAddressBookGroup;
 begin
-  Group := AddressBook1.CreateGroup(FDefaultSource);
+  Group := nil;
+
   try
-    Group.Name := edtGroupName.Text;
     try
+      Group := AddressBook1.CreateGroup(FDefaultSource);
+      Group.Name := edtGroupName.Text;
       AddressBook1.SaveGroup(Group);
       edtGroupName.Text := '';
       TabControl1.ActiveTab := TabItemContacts;
+      FillGroupList(FDefaultSource);
     except
       on E: EAddressBookException do
-        ShowMessage('Cannot add this group.' + E.Message);
+        ShowMessage('Cannot add the group');
     end;
-    FillGroupList(FDefaultSource);
   finally
     Group.Free;
   end;
@@ -414,9 +367,14 @@ end;
 
 procedure TForm1.ActionRefreshExecute(Sender: TObject);
 begin
-  FDefaultSource := AddressBook1.DefaultSource;
-  FillGroupList(FDefaultSource);
-  FillContactList(FDefaultSource);
+  try
+    FDefaultSource := AddressBook1.DefaultSource;
+    FillGroupList(FDefaultSource);
+    FillContactList(FDefaultSource);
+  except
+    on E: EAddressBookException do
+      ShowMessage('Cannot get the groups and contacts');
+  end;
 end;
 
 procedure TForm1.ActionRemoveContactExecute(Sender: TObject);
@@ -427,10 +385,15 @@ end;
 
 procedure TForm1.ActionRemoveGroupExecute(Sender: TObject);
 begin
-  if (ComboBox2.ItemIndex > -1) and (ComboBox2.ItemIndex < FGroups.Count) Then
+  if (ComboBox2.ItemIndex > -1) and (ComboBox2.ItemIndex < FGroups.Count) then
   begin
-    AddressBook1.RemoveGroup(FGroups.Items[ComboBox2.ItemIndex]);
-    FillGroupList(FDefaultSource);
+    try
+      AddressBook1.RemoveGroup(FGroups.Items[ComboBox2.ItemIndex]);
+      FillGroupList(FDefaultSource);
+    except
+      on E: Exception do
+        ShowMessage('Cannot remove the group');
+    end;
   end;
 end;
 
@@ -465,16 +428,6 @@ begin
   finally
     Contacts.Free;
   end;
-end;
-
-// ---------------------------------------------------------------------------
-// Check whether the specified contact exists
-function TForm1.ContactExists(ID: Integer): Boolean;
-var
-  Contact: TAddressBookContact;
-begin
-  Contact := AddressBook1.ContactByID(ID);
-  ContactExists := Contact <> nil;
 end;
 
 // ---------------------------------------------------------------------------
