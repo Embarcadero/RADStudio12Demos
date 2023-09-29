@@ -23,7 +23,8 @@ uses
   FMX.Layouts, FMX.ListBox, FMX.Controls.Presentation, FMX.Edit, FMX.TabControl,
   FMX.Platform, System.Actions, FMX.ActnList, FMX.ListView.Types,
   FMX.ListView.Appearances, FMX.ListView.Adapters.Base, FMX.ListView,
-  FMX.StdActns, FMX.MediaLibrary.Actions, FMX.Objects, FMX.Surfaces;
+  FMX.StdActns, FMX.MediaLibrary.Actions, FMX.Objects, FMX.Surfaces,
+  FMX.MediaLibrary;
 
 type
   TForm1 = class(TForm)
@@ -100,7 +101,6 @@ type
     procedure DeleteContact(const AKey: TModalResult);
     procedure ClearAddContactForm;
     procedure DisplayRationale(Sender: TObject; const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc);
-    procedure TakePicturePermissionRequestResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
   end;
 
 var
@@ -156,16 +156,26 @@ begin
 end;
 
 procedure TForm1.btnTakePictureClick(Sender: TObject);
-var
-  StoragePermission: string;
 begin
+{$IF Defined(ANDROID)}
   if TOSVersion.Check(11) then
     TakePhotoFromCameraAction1.Execute
   else
   begin
-    StoragePermission := JStringToString(TJManifest_permission.JavaClass.WRITE_EXTERNAL_STORAGE);
-    PermissionsService.RequestPermissions([StoragePermission], TakePicturePermissionRequestResult);
+    var StoragePermission := JStringToString(TJManifest_permission.JavaClass.WRITE_EXTERNAL_STORAGE);
+    PermissionsService.RequestPermissions([StoragePermission],
+      procedure(const Permissions: TClassicStringDynArray; const GrantResults: TClassicPermissionStatusDynArray)
+      begin
+        // 1 permission involved: WRITE_EXTERNAL_STORAGE
+        if (Length(GrantResults) = 1) and (GrantResults[0] = TPermissionStatus.Granted) then
+          TakePhotoFromCameraAction1.Execute
+        else
+          ShowMessage('Cannot take a photo because the required permission has not been granted')
+      end);
   end;
+{$ELSE}
+  TakePhotoFromCameraAction1.Execute;
+{$ENDIF}
 end;
 
 // --------------------------------------------------------------------
@@ -220,15 +230,6 @@ begin
     ShowMessage('This platform does not support the Address Book service');
   AddressBook1.RequestPermission(DisplayRationale);
   TabControl1.ActiveTab := TabItemContacts;
-end;
-
-procedure TForm1.TakePicturePermissionRequestResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
-begin
-  // 1 permission involved: WRITE_EXTERNAL_STORAGE
-  if (Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted) then
-    TakePhotoFromCameraAction1.Execute
-  else
-    ShowMessage('Cannot take a photo because the required permission has not been granted')
 end;
 
 procedure TForm1.TakePhotoFromCameraAction1DidFinishTaking(Image: TBitmap);
