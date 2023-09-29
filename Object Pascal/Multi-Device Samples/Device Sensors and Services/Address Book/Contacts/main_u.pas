@@ -157,7 +157,7 @@ end;
 
 procedure TForm1.btnTakePictureClick(Sender: TObject);
 begin
-{$IF Defined(ANDROID)}
+{$IFDEF ANDROID}
   if TOSVersion.Check(11) then
     TakePhotoFromCameraAction1.Execute
   else
