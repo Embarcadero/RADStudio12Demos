@@ -67,13 +67,11 @@
         <AUP_ACCESS_FINE_LOCATION>true</AUP_ACCESS_FINE_LOCATION>
         <AUP_READ_PHONE_STATE>true</AUP_READ_PHONE_STATE>
         <ProjectType>FmxGuiApplication</ProjectType>
-        <ILINK_LibraryPath>..\..\..\Public\Documents\Embarcadero\Studio\16.0\Samples\CPP\FireMonkey Desktop\ControlsDemo\;..\..\..\..\..\..\..\..\..\test\Desktop\ControlsDemoCpp\;..\..\..\..\..\Public\Documents\Embarcadero\Studio\15.0\Samples\CPP\FireMonkey Desktop\ControlsDemo\;$(ILINK_LibraryPath)</ILINK_LibraryPath>
         <AUP_READ_CALENDAR>true</AUP_READ_CALENDAR>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <AUP_READ_EXTERNAL_STORAGE>true</AUP_READ_EXTERNAL_STORAGE>
         <AUP_CAMERA>true</AUP_CAMERA>
         <AUP_ACCESS_COARSE_LOCATION>true</AUP_ACCESS_COARSE_LOCATION>
-        <IncludePath>..\..\..\Public\Documents\Embarcadero\Studio\16.0\Samples\CPP\FireMonkey Desktop\ControlsDemo\;..\..\..\..\..\..\..\..\..\test\Desktop\ControlsDemoCpp\;..\..\..\..\..\Public\Documents\Embarcadero\Studio\15.0\Samples\CPP\FireMonkey Desktop\ControlsDemo\;$(IncludePath)</IncludePath>
         <Icon_MainIcon>$(BDS)\bin\cbuilder_PROJECTICON.ico</Icon_MainIcon>
         <AUP_INTERNET>true</AUP_INTERNET>
         <Multithreaded>true</Multithreaded>
@@ -152,7 +150,7 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <ILINK_LibraryPath>$(BDS)\lib\Win32\debug\;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+        <ILINK_LibraryPath>$(BDSLIB)\$(PLATFORM)$(CC_SUFFIX)\debug;$(ILINK_LibraryPath)</ILINK_LibraryPath>
         <BT_BuildType>Debug</BT_BuildType>
         <UsePackages>false</UsePackages>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>

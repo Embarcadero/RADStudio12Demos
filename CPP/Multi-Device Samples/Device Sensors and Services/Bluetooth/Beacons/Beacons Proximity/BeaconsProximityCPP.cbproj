@@ -97,14 +97,12 @@
         <AUP_CAMERA>true</AUP_CAMERA>
         <AUP_WRITE_EXTERNAL_STORAGE>true</AUP_WRITE_EXTERNAL_STORAGE>
         <Multithreaded>true</Multithreaded>
-        <IncludePath>$(BDS)\experiments\RTL\Bluetooth\Beacon\Beacons demo\Beacons Proximity\CPP\;$(IncludePath)</IncludePath>
         <AUP_CALL_PHONE>true</AUP_CALL_PHONE>
         <Icon_MainIcon>$(BDS)\bin\cbuilder_PROJECTICON.ico</Icon_MainIcon>
         <AllPackageLibs>rtl.lib;fmx.lib</AllPackageLibs>
         <AUP_READ_EXTERNAL_STORAGE>true</AUP_READ_EXTERNAL_STORAGE>
         <Icns_MainIcns>$(BDS)\bin\cbuilder_PROJECTICNS.icns</Icns_MainIcns>
         <AUP_INTERNET>true</AUP_INTERNET>
-        <ILINK_LibraryPath>$(BDS)\experiments\RTL\Bluetooth\Beacon\Beacons demo\Beacons Proximity\CPP\;$(ILINK_LibraryPath)</ILINK_LibraryPath>
         <DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
         <DynamicRTL>true</DynamicRTL>
         <UsePackages>true</UsePackages>
@@ -264,7 +262,7 @@
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <LinkPackageImports>rtl.bpi;fmx.bpi</LinkPackageImports>
-        <ILINK_LibraryPath>$(BDS)\lib\Win32\debug\;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+        <ILINK_LibraryPath>$(BDSLIB)\$(PLATFORM)$(CC_SUFFIX)\debug;$(ILINK_LibraryPath)</ILINK_LibraryPath>
         <AppDPIAwarenessMode>PerMonitor</AppDPIAwarenessMode>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>

@@ -97,14 +97,12 @@
         <ProjectType>FmxGuiApplication</ProjectType>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <AUP_WRITE_EXTERNAL_STORAGE>true</AUP_WRITE_EXTERNAL_STORAGE>
-        <IncludePath>$(BDS)\experiments\RTL\Bluetooth\Beacon\Beacons demo\DemoProximityColors\CPP\;$(IncludePath)</IncludePath>
         <AUP_WRITE_CALENDAR>true</AUP_WRITE_CALENDAR>
         <_TCHARMapping>wchar_t</_TCHARMapping>
         <Icns_MainIcns>$(BDS)\bin\cbuilder_PROJECTICNS.icns</Icns_MainIcns>
         <AUP_INTERNET>true</AUP_INTERNET>
         <AUP_CAMERA>true</AUP_CAMERA>
         <AUP_ACCESS_FINE_LOCATION>true</AUP_ACCESS_FINE_LOCATION>
-        <ILINK_LibraryPath>$(BDS)\experiments\RTL\Bluetooth\Beacon\Beacons demo\DemoProximityColors\CPP\;$(ILINK_LibraryPath)</ILINK_LibraryPath>
         <DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
         <DynamicRTL>true</DynamicRTL>
         <UsePackages>true</UsePackages>
@@ -265,7 +263,7 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <LinkPackageImports>rtl.bpi;fmx.bpi</LinkPackageImports>
-        <ILINK_LibraryPath>$(BDS)\lib\Win32\debug\;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+        <ILINK_LibraryPath>$(BDSLIB)\$(PLATFORM)$(CC_SUFFIX)\debug;$(ILINK_LibraryPath)</ILINK_LibraryPath>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>

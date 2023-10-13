@@ -98,10 +98,8 @@
         <_TCHARMapping>wchar_t</_TCHARMapping>
         <Multithreaded>true</Multithreaded>
         <ProjectType>FmxGuiApplication</ProjectType>
-        <ILINK_LibraryPath>..\..\..\Desktop\Darren\CppMediaPlayerHD\;$(ILINK_LibraryPath)</ILINK_LibraryPath>
         <Icon_MainIcon>$(BDS)\bin\cbuilder_PROJECTICON.ico</Icon_MainIcon>
         <AllPackageLibs>rtl.lib;fmx.lib;tethering.lib;CustomIPTransport.lib;IndyIPClient.lib;IndyIPCommon.lib;IndySystem.lib;IndyProtocols.lib;IndyCore.lib;IndyIPServer.lib</AllPackageLibs>
-        <IncludePath>..\..\..\Desktop\Darren\CppMediaPlayerHD\;$(IncludePath)</IncludePath>
         <DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
         <DynamicRTL>true</DynamicRTL>
         <UsePackages>true</UsePackages>
@@ -205,7 +203,7 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <UsePackages>false</UsePackages>
-        <ILINK_LibraryPath>$(BDS)\lib\Win32\debug\;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+        <ILINK_LibraryPath>$(BDSLIB)\$(PLATFORM)$(CC_SUFFIX)\debug;$(ILINK_LibraryPath)</ILINK_LibraryPath>
         <LinkPackageStatics>rtl.lib;fmx.lib;tethering.lib;CustomIPTransport.lib;IndyIPClient.lib;IndyIPCommon.lib;IndySystem.lib;IndyProtocols.lib;IndyCore.lib;IndyIPServer.lib</LinkPackageStatics>
         <BT_BuildType>Debug</BT_BuildType>
     </PropertyGroup>

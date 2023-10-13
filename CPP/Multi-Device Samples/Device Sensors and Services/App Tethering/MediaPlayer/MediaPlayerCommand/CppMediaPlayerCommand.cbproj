@@ -95,7 +95,6 @@
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <AUP_READ_CALENDAR>true</AUP_READ_CALENDAR>
         <AUP_ACCESS_COARSE_LOCATION>true</AUP_ACCESS_COARSE_LOCATION>
-        <ILINK_LibraryPath>..\..\..\Desktop\CPP\MediaPlayerCommand\;$(ILINK_LibraryPath)</ILINK_LibraryPath>
         <AllPackageLibs>rtl.lib;fmx.lib;tethering.lib;CustomIPTransport.lib;IndyIPClient.lib;IndyIPCommon.lib;IndySystem.lib;IndyProtocols.lib;IndyCore.lib;IndyIPServer.lib</AllPackageLibs>
         <Icns_MainIcns>$(BDS)\bin\cbuilder_PROJECTICNS.icns</Icns_MainIcns>
         <AUP_READ_PHONE_STATE>true</AUP_READ_PHONE_STATE>
@@ -107,7 +106,6 @@
         <_TCHARMapping>wchar_t</_TCHARMapping>
         <Icon_MainIcon>$(BDS)\bin\cbuilder_PROJECTICON.ico</Icon_MainIcon>
         <SanitizedProjectName>CppMediaPlayerCommand</SanitizedProjectName>
-        <IncludePath>..\..\..\Desktop\CPP\MediaPlayerCommand\;$(IncludePath)</IncludePath>
         <AUP_INTERNET>true</AUP_INTERNET>
         <AUP_CALL_PHONE>true</AUP_CALL_PHONE>
         <AUP_WRITE_EXTERNAL_STORAGE>true</AUP_WRITE_EXTERNAL_STORAGE>
@@ -278,7 +276,7 @@
         <LinkPackageStatics>rtl.lib;fmx.lib;tethering.lib;CustomIPTransport.lib;IndyIPClient.lib;IndyIPCommon.lib;IndySystem.lib;IndyProtocols.lib;IndyCore.lib;IndyIPServer.lib</LinkPackageStatics>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <ILINK_LibraryPath>$(BDS)\lib\Win32\debug\;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+        <ILINK_LibraryPath>$(BDSLIB)\$(PLATFORM)$(CC_SUFFIX)\debug;$(ILINK_LibraryPath)</ILINK_LibraryPath>
         <BT_BuildType>Debug</BT_BuildType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
