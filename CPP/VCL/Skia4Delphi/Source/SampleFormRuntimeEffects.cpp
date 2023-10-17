@@ -20,11 +20,17 @@
 #pragma resource "*.dfm"
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmRuntimeEffects::pnlShaderAnimationClick(TObject* Sender)
+void __fastcall TfrmRuntimeEffects::pnlStarNestShaderAnimationClick(TObject* Sender)
 {
-	auto LEffect = TSkRuntimeEffect::MakeForShader(TFile::ReadAllText(AssetsPath + Ioutils::TPath::Combine("RuntimeEffects Shaders", "rainbow-twister.sksl")));
+	auto LEffect = TSkRuntimeEffect::MakeForShader(TFile::ReadAllText(AssetsPath + Ioutils::TPath::Combine("RuntimeEffects Shaders", "star-nest.sksl")));
 	auto LEffectBuilder = SkRuntimeShaderBuilder(LEffect);
-	ChildForm<TfrmAnimatedPaintBoxViewer>()->Show("Shader Animation", "Shader that varies with time (iTime uniform)",
+	
+	ChildForm<TfrmAnimatedPaintBoxViewer>()->OnMouseMove =
+		[this, LEffectBuilder](const float AX, const float AY) {
+			LEffectBuilder->SetUniform("iMouse", PointF(AX, AY));
+		};
+	
+	ChildForm<TfrmAnimatedPaintBoxViewer>()->Show("Star Nest Shader Animation", "Shader that varies with time (iTime uniform) and mouse position (iMouse uniform)",
 		[this, LEffectBuilder](ISkCanvas* const ACanvas, const TRectF& ADest, const Double ASeconds) {
 			LEffectBuilder->SetUniform("iResolution", PointF(ADest.Width(), ADest.Height()));
 			LEffectBuilder->SetUniform("iTime", (float) ASeconds);
@@ -55,13 +61,14 @@ void __fastcall TfrmRuntimeEffects::pnlShaderWithMouseClick(TObject* Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmRuntimeEffects::pnlWavesShaderAnimationClick(TObject* Sender)
+void __fastcall TfrmRuntimeEffects::pnlTimeVaryingShaderClick(TObject* Sender)
 {
-	auto LEffect = TSkRuntimeEffect::MakeForShader(TFile::ReadAllText(AssetsPath + Ioutils::TPath::Combine("RuntimeEffects Shaders", "waves.sksl")));
+	auto LEffect = TSkRuntimeEffect::MakeForShader(TFile::ReadAllText(AssetsPath + Ioutils::TPath::Combine("RuntimeEffects Shaders", "time.sksl")));
 	auto LEffectBuilder = SkRuntimeShaderBuilder(LEffect);
-	ChildForm<TfrmAnimatedPaintBoxViewer>()->Show("Waves Shader Animation", "Shader that varies with time (iTime uniform)",
+	LEffectBuilder->SetUniform("iColor1", TAlphaColorF::Create(0xffa22a2a));
+	LEffectBuilder->SetUniform("iColor2", TAlphaColorF::Create(0xff187735));
+	ChildForm<TfrmAnimatedPaintBoxViewer>()->Show("Time-varying Shader", "Example of a simple shader varying the color according to time (iTime uniform)",
 		[this, LEffectBuilder](ISkCanvas* const ACanvas, const TRectF& ADest, const Double ASeconds) {
-			LEffectBuilder->SetUniform("iResolution", PointF(ADest.Width(), ADest.Height()));
 			LEffectBuilder->SetUniform("iTime", (float) ASeconds);
 			auto LPaint = SkPaint();
 			LPaint->Shader = LEffectBuilder->MakeShader();

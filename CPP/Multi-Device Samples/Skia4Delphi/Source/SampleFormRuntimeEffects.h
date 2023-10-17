@@ -28,19 +28,19 @@
 class TfrmRuntimeEffects : public TfrmBase
 {
 __published:
-	TSpeedButton *btnShaderAnimation;
-	TSkLabel *lblShaderAnimationTitle;
-	TSkLabel *lblShaderAnimationDescription;
+	TSpeedButton *btnStarNestShaderAnimation;
+	TSkLabel *lblStarNestShaderAnimationTitle;
+	TSkLabel *lblStarNestShaderAnimationDescription;
 	TSpeedButton *btnShaderWithMouse;
 	TSkLabel *lblShaderWithMouseTitle;
 	TSkLabel *lblShaderWithMouseDescription;
-	TSpeedButton *btnWavesShaderAnimation;
-	TSkLabel *lblWavesShaderAnimationTitle;
-	TSkLabel *lblWavesShaderAnimationDescription;
+	TSpeedButton *btnTimeVaryingShader;
+	TSkLabel *lblTimeVaryingShaderTitle;
+	TSkLabel *lblTimeVaryingShaderDescription;
 	TLayout *lytContentTopOffset;
-	void __fastcall btnShaderAnimationClick(TObject* Sender);
+	void __fastcall btnStarNestShaderAnimationClick(TObject* Sender);
 	void __fastcall btnShaderWithMouseClick(TObject* Sender);
-	void __fastcall btnWavesShaderAnimationClick(TObject* Sender);
+	void __fastcall btnTimeVaryingShaderClick(TObject* Sender);
 public:
 	__fastcall TfrmRuntimeEffects(TComponent* Owner) override : TfrmBase(Owner) {}
 };

@@ -56,7 +56,7 @@ void __fastcall TfrmBase::btnBackClick(TObject* Sender)
 	// -   https://quality.embarcadero.com/browse/RSP-36959
 	// -
 	// - -----------------------------------------------------------------------
-	#if __BCPLUSPLUS__ > 0x0760
+	#if __BCPLUSPLUS__ > 0x0770
 		#warning Check if the issue has been fixed
 	#endif
 	// - -----------------------------------------------------------------------
@@ -102,7 +102,7 @@ void TfrmBase::CloseForm(TfrmBase* AForm)
 			auto LIndex = find(FShowingFormsList.begin(), FShowingFormsList.end(), *it);
 			if (LIndex != FShowingFormsList.end())
 				FShowingFormsList.erase(LIndex);
-			(*it)->DisposeOf();
+			delete *it;
 			FCreatedFormsList.erase(it--);
 		}
 		FShowingFormsList.back()->rctContent->Enabled = true;

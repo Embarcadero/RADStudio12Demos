@@ -68,8 +68,8 @@ end;
 procedure ShowHelp;
 {$I ..\FireDAC.Stan.Config.inc}
 begin
-  WriteLn(C_FD_ProductFull + ' v ' + C_FD_Version);
-  WriteLn(C_FD_Copyright);
+  WriteLn(StringReplace(C_FD_ProductFull, #$00AE, '', [rfReplaceAll]) + ' v ' + C_FD_Version);
+  WriteLn(StringReplace(C_FD_Copyright, #$00A9, '(c)', [rfReplaceAll]));
   WriteLn('');
   WriteLn('Use: FDExecutor [-d <name>] [-n <file name>] [-u <user>] [-w <pwd>] [-l] [-e]');
   WriteLn('             [-i] [-s] [-p <path>] [-t <path>] [{<scripts>}] [-a {<arguments>}]');

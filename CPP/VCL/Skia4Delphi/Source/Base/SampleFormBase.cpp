@@ -58,7 +58,7 @@ void TfrmBase::CloseForm(TfrmBase* AForm)
 				auto LIndex = find(FShowingFormsList.begin(), FShowingFormsList.end(), *it);
 				if (LIndex != FShowingFormsList.end())
 					FShowingFormsList.erase(LIndex);
-				(*it)->Free();
+				delete *it;
 				FCreatedFormsList.erase(it--);
 			}
 		  FShowingFormsList.back()->pnlContent->Visible = true;

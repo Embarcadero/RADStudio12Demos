@@ -43,7 +43,7 @@ void __fastcall TfrmTSkSVG::btnCustomColorClick(TObject* Sender)
 			LSvgControl->Align = TAlignLayout::Client;
 			if (!LOptions->Bool["Show original"])
 				LSvgControl->Svg->OverrideColor = TAlphaColors::Blueviolet;
-			LSvgControl->Svg->Source = TFile::ReadAllText(AssetsPath + "tesla.svg");
+			LSvgControl->Svg->Source = TFile::ReadAllText(AssetsPath + "bat.svg");
 			return LSvgControl;
 		}, TBackgroundKind::Chess, LOptions);
 }
@@ -54,11 +54,11 @@ void __fastcall TfrmTSkSVG::btnEditingElementClick(TObject* Sender)
 	TViewerOptions* LOptions = new TViewerOptions();
 	LOptions->AddBoolean("Show original", false);
 
-	ChildForm<TfrmControlViewer>()->Show("Editing an SVG Element", "Editing the eyes of the android svg to red color",
+	ChildForm<TfrmControlViewer>()->Show("Editing an SVG Element", "Editing the eyes of the lamb svg to red color",
 		[this, LOptions]() {
 			TSkSvg* LSvgControl = new TSkSvg(nullptr);
 			LSvgControl->Align = TAlignLayout::Client;
-			LSvgControl->Svg->Source = TFile::ReadAllText(AssetsPath + "android.svg");
+			LSvgControl->Svg->Source = TFile::ReadAllText(AssetsPath + "lamb.svg");
 			if (!LOptions->Bool["Show original"])
 				LSvgControl->Svg->DOM->FindNodeById("eyes")->TrySetAttribute("fill", "red");
 			return LSvgControl;
@@ -66,13 +66,13 @@ void __fastcall TfrmTSkSVG::btnEditingElementClick(TObject* Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmTSkSVG::btnGorillaClick(TObject* Sender)
+void __fastcall TfrmTSkSVG::btnPandaClick(TObject* Sender)
 {
-	ChildForm<TfrmControlViewer>()->Show("gorilla.svg", "",
+	ChildForm<TfrmControlViewer>()->Show("panda.svg", "",
 		[this]() {
 			TSkSvg* LSvgControl = new TSkSvg(nullptr);
 			LSvgControl->Align = TAlignLayout::Client;
-			LSvgControl->Svg->Source = TFile::ReadAllText(AssetsPath + "gorilla.svg");
+			LSvgControl->Svg->Source = TFile::ReadAllText(AssetsPath + "panda.svg");
 			return LSvgControl;
 		});
 }
@@ -85,7 +85,7 @@ void __fastcall TfrmTSkSVG::btnTileWrapModeClick(TObject* Sender)
 			TSkSvg* LSvgControl = new TSkSvg(nullptr);
 			LSvgControl->Align = TAlignLayout::Client;
 			LSvgControl->Svg->WrapMode = TSkSvgWrapMode::Tile;
-			LSvgControl->Svg->Source = TFile::ReadAllText(AssetsPath + "anchors-away.svg");
+			LSvgControl->Svg->Source = TFile::ReadAllText(AssetsPath + "carrots.svg");
 			return LSvgControl;
 		}, TBackgroundKind::Solid);
 }

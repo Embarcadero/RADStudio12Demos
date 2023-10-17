@@ -27,7 +27,7 @@ inherited frmRuntimeEffects: TfrmRuntimeEffects
       Height = 485
       ExplicitWidth = 348
       ExplicitHeight = 484
-      object pnlShaderAnimation: TPanel
+      object pnlStarNestShaderAnimation: TPanel
         AlignWithMargins = True
         Left = 20
         Top = 21
@@ -49,12 +49,12 @@ inherited frmRuntimeEffects: TfrmRuntimeEffects
         ParentFont = False
         ShowCaption = False
         TabOrder = 0
-        OnClick = pnlShaderAnimationClick
+        OnClick = pnlStarNestShaderAnimationClick
         ExplicitWidth = 308
         DesignSize = (
           312
           50)
-        object lblShaderAnimationDescription: TSkLabel
+        object lblStarNestShaderAnimationDescription: TSkLabel
           AlignWithMargins = True
           Left = 0
           Top = 25
@@ -65,7 +65,7 @@ inherited frmRuntimeEffects: TfrmRuntimeEffects
           Margins.Right = 16
           Margins.Bottom = 0
           Align = alTop
-          OnClick = pnlShaderAnimationClick
+          OnClick = pnlStarNestShaderAnimationClick
           TextSettings.Font.Size = 11.000000000000000000
           TextSettings.FontColor = xFFA0A0A1
           TextSettings.MaxLines = 1
@@ -76,7 +76,7 @@ inherited frmRuntimeEffects: TfrmRuntimeEffects
           ExplicitTop = 26
           ExplicitWidth = 303
         end
-        object lblShaderAnimationTitle: TSkLabel
+        object lblStarNestShaderAnimationTitle: TSkLabel
           AlignWithMargins = True
           Left = 0
           Top = 6
@@ -87,23 +87,23 @@ inherited frmRuntimeEffects: TfrmRuntimeEffects
           Margins.Right = 16
           Margins.Bottom = 0
           Align = alTop
-          OnClick = pnlShaderAnimationClick
+          OnClick = pnlStarNestShaderAnimationClick
           TextSettings.Font.Weight = Medium
           TextSettings.FontColor = xFF1B1B1B
           TextSettings.MaxLines = 2
           Words = <
             item
-              Caption = 'Animation using Shader'
+              Caption = 'Star Nest Shader Animation'
             end>
           ExplicitWidth = 303
         end
-        object svgShaderAnimationArrow: TSkSvg
+        object svgStarNestShaderAnimationArrow: TSkSvg
           Left = 295
           Top = 17
           Width = 16
           Height = 16
           Anchors = [akTop, akRight]
-          OnClick = pnlShaderAnimationClick
+          OnClick = pnlStarNestShaderAnimationClick
           Svg.Source = 
             '<?xml version="1.0" encoding="iso-8859-1"?>'#13#10'<!-- Generator: Ado' +
             'be Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Bu' +
@@ -121,7 +121,7 @@ inherited frmRuntimeEffects: TfrmRuntimeEffects
             '>'
           ExplicitLeft = 298
         end
-        object pnlShaderAnimationLine: TPanel
+        object pnlStarNestShaderAnimationLine: TPanel
           Left = 0
           Top = 49
           Width = 312
@@ -243,7 +243,7 @@ inherited frmRuntimeEffects: TfrmRuntimeEffects
           ExplicitWidth = 308
         end
       end
-      object pnlWavesShaderAnimation: TPanel
+      object pnlTimeVaryingShader: TPanel
         AlignWithMargins = True
         Left = 20
         Top = 71
@@ -265,12 +265,12 @@ inherited frmRuntimeEffects: TfrmRuntimeEffects
         ParentFont = False
         ShowCaption = False
         TabOrder = 2
-        OnClick = pnlWavesShaderAnimationClick
+        OnClick = pnlTimeVaryingShaderClick
         ExplicitWidth = 308
         DesignSize = (
           312
           50)
-        object lblWavesShaderAnimationDescription: TSkLabel
+        object lblTimeVaryingShaderDescription: TSkLabel
           AlignWithMargins = True
           Left = 0
           Top = 25
@@ -281,18 +281,18 @@ inherited frmRuntimeEffects: TfrmRuntimeEffects
           Margins.Right = 16
           Margins.Bottom = 0
           Align = alTop
-          OnClick = pnlWavesShaderAnimationClick
+          OnClick = pnlTimeVaryingShaderClick
           TextSettings.Font.Size = 11.000000000000000000
           TextSettings.FontColor = xFFA0A0A1
           TextSettings.MaxLines = 1
           Words = <
             item
-              Caption = 'Example of waves shader animation using Runtime Effects'
+              Caption = 'Simple shader varying the color according to time'
             end>
           ExplicitTop = 26
           ExplicitWidth = 303
         end
-        object lblWavesShaderAnimationTitle: TSkLabel
+        object lblTimeVaryingShaderTitle: TSkLabel
           AlignWithMargins = True
           Left = 0
           Top = 6
@@ -303,23 +303,23 @@ inherited frmRuntimeEffects: TfrmRuntimeEffects
           Margins.Right = 16
           Margins.Bottom = 0
           Align = alTop
-          OnClick = pnlWavesShaderAnimationClick
+          OnClick = pnlTimeVaryingShaderClick
           TextSettings.Font.Weight = Medium
           TextSettings.FontColor = xFF1B1B1B
           TextSettings.MaxLines = 2
           Words = <
             item
-              Caption = 'Waves Shader Animation'
+              Caption = 'Time-varying Shader'
             end>
           ExplicitWidth = 303
         end
-        object svgWavesShaderAnimationArrow: TSkSvg
+        object svgTimeVaryingShaderArrow: TSkSvg
           Left = 299
           Top = 17
           Width = 16
           Height = 16
           Anchors = [akTop, akRight]
-          OnClick = pnlWavesShaderAnimationClick
+          OnClick = pnlTimeVaryingShaderClick
           Svg.Source = 
             '<?xml version="1.0" encoding="iso-8859-1"?>'#13#10'<!-- Generator: Ado' +
             'be Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Bu' +
@@ -337,7 +337,7 @@ inherited frmRuntimeEffects: TfrmRuntimeEffects
             '>'
           ExplicitLeft = 298
         end
-        object pnlWavesShaderAnimationLine: TPanel
+        object pnlTimeVaryingShaderLine: TPanel
           Left = 0
           Top = 49
           Width = 312

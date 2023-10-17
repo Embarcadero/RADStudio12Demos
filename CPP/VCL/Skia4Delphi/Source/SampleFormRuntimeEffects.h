@@ -25,24 +25,24 @@
 class TfrmRuntimeEffects : public TfrmBase
 {
 __published:
-	TPanel *pnlShaderAnimation;
-	TSkLabel *lblShaderAnimationDescription;
-	TSkLabel *lblShaderAnimationTitle;
-	TSkSvg *svgShaderAnimationArrow;
-	TPanel *pnlShaderAnimationLine;
+	TPanel *pnlStarNestShaderAnimation;
+	TSkLabel *lblStarNestShaderAnimationDescription;
+	TSkLabel *lblStarNestShaderAnimationTitle;
+	TSkSvg *svgStarNestShaderAnimationArrow;
+	TPanel *pnlStarNestShaderAnimationLine;
 	TPanel *pnlShaderWithMouse;
 	TSkLabel *lblShaderWithMouseDescription;
 	TSkLabel *lblShaderWithMouseTitle;
 	TSkSvg *svgShaderWithMouseArrow;
 	TPanel *pnlShaderWithMouseLine;
-	TPanel *pnlWavesShaderAnimation;
-	TSkLabel *lblWavesShaderAnimationDescription;
-	TSkLabel *lblWavesShaderAnimationTitle;
-	TSkSvg *svgWavesShaderAnimationArrow;
-	TPanel *pnlWavesShaderAnimationLine;
-	void __fastcall pnlShaderAnimationClick(TObject* Sender);
+	TPanel *pnlTimeVaryingShader;
+	TSkLabel *lblTimeVaryingShaderDescription;
+	TSkLabel *lblTimeVaryingShaderTitle;
+	TSkSvg *svgTimeVaryingShaderArrow;
+	TPanel *pnlTimeVaryingShaderLine;
+	void __fastcall pnlStarNestShaderAnimationClick(TObject* Sender);
 	void __fastcall pnlShaderWithMouseClick(TObject* Sender);
-	void __fastcall pnlWavesShaderAnimationClick(TObject* Sender);
+	void __fastcall pnlTimeVaryingShaderClick(TObject* Sender);
 public:
 	__fastcall TfrmRuntimeEffects(TComponent* Owner) override : TfrmBase(Owner) {}
 };

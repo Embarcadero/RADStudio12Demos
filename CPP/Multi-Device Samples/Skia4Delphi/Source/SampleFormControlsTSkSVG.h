@@ -37,9 +37,9 @@ __published:
 	TSpeedButton *btnEditingElement;
 	TSkLabel *lblEditingElementTitle;
 	TSkLabel *lblEditingElementDescription;
-	TSpeedButton *btnGorilla;
-	TSkLabel *lblGorillaTitle;
-	TSkLabel *lblGorillaDescription;
+	TSpeedButton *btnPanda;
+	TSkLabel *lblPandaTitle;
+	TSkLabel *lblPandaDescription;
 	TSpeedButton *btnTileWrapMode;
 	TSkLabel *lblTileWrapModeTitle;
 	TSkLabel *lblTileWrapModeDescription;
@@ -47,7 +47,7 @@ __published:
 	void __fastcall btnCBuilderClick(TObject* Sender);
 	void __fastcall btnCustomColorClick(TObject* Sender);
 	void __fastcall btnEditingElementClick(TObject* Sender);
-	void __fastcall btnGorillaClick(TObject* Sender);
+	void __fastcall btnPandaClick(TObject* Sender);
 	void __fastcall btnTileWrapModeClick(TObject* Sender);
 public:
 	__fastcall TfrmTSkSVG(TComponent* Owner) override : TfrmBase(Owner) {}

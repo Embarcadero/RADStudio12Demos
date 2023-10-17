@@ -24,7 +24,7 @@ inherited frmTSkSVG: TfrmTSkSVG
     inherited sbxContent: TScrollBox
       Height = 526
       ExplicitWidth = 352
-      object pnlGorilla: TPanel
+      object pnlPanda: TPanel
         AlignWithMargins = True
         Left = 20
         Top = 21
@@ -46,12 +46,12 @@ inherited frmTSkSVG: TfrmTSkSVG
         ParentFont = False
         ShowCaption = False
         TabOrder = 0
-        OnClick = pnlGorillaClick
+        OnClick = pnlPandaClick
         ExplicitWidth = 312
         DesignSize = (
           316
           50)
-        object lblGorillaDescription: TSkLabel
+        object lblPandaDescription: TSkLabel
           AlignWithMargins = True
           Left = 0
           Top = 25
@@ -62,18 +62,18 @@ inherited frmTSkSVG: TfrmTSkSVG
           Margins.Right = 16
           Margins.Bottom = 0
           Align = alTop
-          OnClick = pnlGorillaClick
+          OnClick = pnlPandaClick
           TextSettings.Font.Size = 11.000000000000000000
           TextSettings.FontColor = xFFA0A0A1
           TextSettings.MaxLines = 1
           Words = <
             item
-              Caption = 'See the sample loading the asset'#39's file "gorilla.svg"'
+              Caption = 'See the sample loading the asset'#39's file "panda.svg"'
             end>
           ExplicitTop = 21
           ExplicitWidth = 278
         end
-        object lblGorillaTitle: TSkLabel
+        object lblPandaTitle: TSkLabel
           AlignWithMargins = True
           Left = 0
           Top = 6
@@ -84,24 +84,24 @@ inherited frmTSkSVG: TfrmTSkSVG
           Margins.Right = 16
           Margins.Bottom = 0
           Align = alTop
-          OnClick = pnlGorillaClick
+          OnClick = pnlPandaClick
           TextSettings.Font.Weight = Medium
           TextSettings.FontColor = xFF1B1B1B
           TextSettings.MaxLines = 2
           Words = <
             item
-              Caption = 'gorilla.svg'
+              Caption = 'panda.svg'
             end>
           ExplicitTop = 2
           ExplicitWidth = 278
         end
-        object svgGorillaArrow: TSkSvg
+        object svgPandaArrow: TSkSvg
           Left = 299
           Top = 17
           Width = 16
           Height = 16
           Anchors = [akTop, akRight]
-          OnClick = pnlGorillaClick
+          OnClick = pnlPandaClick
           Svg.Source = 
             '<?xml version="1.0" encoding="iso-8859-1"?>'#13#10'<!-- Generator: Ado' +
             'be Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Bu' +
@@ -119,7 +119,7 @@ inherited frmTSkSVG: TfrmTSkSVG
             '>'
           ExplicitLeft = 298
         end
-        object pnlGorillaLine: TPanel
+        object pnlPandaLine: TPanel
           Left = 0
           Top = 49
           Width = 316

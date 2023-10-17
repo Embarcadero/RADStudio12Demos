@@ -136,7 +136,7 @@ var
 implementation
 
 uses
-  System.UITypes, System.JSON, REST.Json;
+  System.UITypes, System.JSON, REST.Json, Winapi.EdgeUtils;
 
 {$R *.dfm}
 
@@ -317,6 +317,8 @@ end;
 
 procedure Tfrm_Main.FormCreate(Sender: TObject);
 begin
+  // Optionally specify path to WebView2Loader.dll
+  // SetWebView2Path('C:\Documents and Settings\User\Local Settings\Microsoft\OneDrive\23.169.0813.0001\WebView2Loader.dll');
   FINIFilename := ChangeFileExt(Application.ExeName, '.ini');
   LoadConnectionData(FINIFilename);
 

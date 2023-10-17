@@ -192,7 +192,7 @@ inherited frmTSkSVG: TfrmTSkSVG
             end>
         end
       end
-      object btnGorilla: TSpeedButton
+      object btnPanda: TSpeedButton
         Align = Top
         ClipChildren = True
         Cursor = crHandPoint
@@ -207,8 +207,8 @@ inherited frmTSkSVG: TfrmTSkSVG
         Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         StyleLookup = 'speedbuttonstyle_menu'
-        OnClick = btnGorillaClick
-        object lblGorillaTitle: TSkLabel
+        OnClick = btnPandaClick
+        object lblPandaTitle: TSkLabel
           Align = MostTop
           Position.X = 5.000000000000000000
           Position.Y = 6.000000000000000000
@@ -219,10 +219,10 @@ inherited frmTSkSVG: TfrmTSkSVG
           StyleLookup = 'sklabelstyle_menu_title'
           Words = <
             item
-              Text = 'gorilla.svg'
+              Text = 'panda.svg'
             end>
         end
-        object lblGorillaDescription: TSkLabel
+        object lblPandaDescription: TSkLabel
           Align = Top
           Position.X = 5.000000000000000000
           Position.Y = 25.000000000000000000
@@ -233,7 +233,7 @@ inherited frmTSkSVG: TfrmTSkSVG
           StyleLookup = 'sklabelstyle_menu_description'
           Words = <
             item
-              Text = 'See the sample loading the asset'#39's file "gorilla.svg"'
+              Text = 'See the sample loading the asset'#39's file "panda.svg"'
             end>
         end
       end

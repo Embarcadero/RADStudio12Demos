@@ -62,7 +62,7 @@ public:
 // -   https://quality.embarcadero.com/browse/RSP-36958
 // -
 // - ---------------------------------------------------------------------------
-#if __BCPLUSPLUS__ > 0x0760
+#if __BCPLUSPLUS__ > 0x0770
 	#warning Check if the issue has been fixed
 #endif
 // - ---------------------------------------------------------------------------
@@ -161,9 +161,9 @@ void __fastcall TfrmTransforms::pnl3DRotationClick(TObject* Sender)
             _di_ISkImage LImage;
 
 			if (Sign(Cos(DegToRad(LOptions->Float["X-Axis Rotation"])) * Cos(DegToRad(LOptions->Float["Y-Axis Rotation"]))) == NegativeValue)
-				LImage = TSkImage::MakeFromEncodedFile(AssetsPath + "deck-card-back.png");
+				LImage = TSkImage::MakeFromEncodedFile(AssetsPath + "deck-card-back.webp");
 			else
-				LImage = TSkImage::MakeFromEncodedFile(AssetsPath + "deck-card-front.png");
+				LImage = TSkImage::MakeFromEncodedFile(AssetsPath + "deck-card-front.webp");
             float LRatio;
 			RectF(0, 0, LImage->Width, LImage->Height).FitInto(ADest, LRatio);
 			LRatio = LRatio * (1 + MarginProportion);
@@ -272,7 +272,7 @@ void __fastcall TfrmTransforms::pnlStrechedCornersClick(TObject* Sender)
 		[this, LOptions](ISkCanvas* const ACanvas, const TRectF& ADest) {
 			static const TAlphaColor CornerButtonColor[] = { 0x7F365FF4, 0x9FFF0000 };
 			TCornersF LCorners;
-			auto LImage = TSkImage::MakeFromEncodedFile(AssetsPath + "toy-story.jpg");
+			auto LImage = TSkImage::MakeFromEncodedFile(AssetsPath + "wolf.webp");
 			auto LDest = ADest;
 			LDest.Inflate(-50, -50);
 
@@ -315,7 +315,7 @@ void __fastcall TfrmTransforms::pnlTaperTransformClick(TObject* Sender)
 
 	ChildForm<TfrmPaintBoxViewer>()->Show("Taper Transform", "",
 		[this, LOptions](ISkCanvas* const ACanvas, const TRectF& ADest) {
-			auto LImage = TSkImage::MakeFromEncodedFile(AssetsPath + "simpsons.webp");
+			auto LImage = TSkImage::MakeFromEncodedFile(AssetsPath + "prehistoric.webp");
 			TRectF LDest = ADest;
 			LDest.Inflate(-50, -50);
 

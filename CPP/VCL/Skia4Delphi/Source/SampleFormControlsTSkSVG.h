@@ -25,11 +25,11 @@
 class TfrmTSkSVG : public TfrmBase
 {
 __published:
-	TPanel *pnlGorilla;
-	TSkLabel *lblGorillaDescription;
-	TSkLabel *lblGorillaTitle;
-	TSkSvg *svgGorillaArrow;
-	TPanel *pnlGorillaLine;
+	TPanel *pnlPanda;
+	TSkLabel *lblPandaDescription;
+	TSkLabel *lblPandaTitle;
+	TSkSvg *svgPandaArrow;
+	TPanel *pnlPandaLine;
 	TPanel *pnlCBuilder;
 	TSkLabel *lblCBuilderDescription;
 	TSkLabel *lblCBuilderTitle;
@@ -53,7 +53,7 @@ __published:
 	void __fastcall pnlCBuilderClick(TObject* Sender);
 	void __fastcall pnlCustomColorClick(TObject* Sender);
 	void __fastcall pnlEditingElementClick(TObject* Sender);
-	void __fastcall pnlGorillaClick(TObject* Sender);
+	void __fastcall pnlPandaClick(TObject* Sender);
 	void __fastcall pnlTileWrapModeClick(TObject* Sender);
 public:
 	__fastcall TfrmTSkSVG(TComponent* Owner) override : TfrmBase(Owner) {}

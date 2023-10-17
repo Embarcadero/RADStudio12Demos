@@ -256,7 +256,7 @@ void __fastcall TViewerOptions::OnSwitchClick(TObject* ASender)
 void __fastcall TViewerOptions::OnTrackBarChange(TObject* ASender)
 {
 	TTrackBar* LTrackBar = (TTrackBar*) ASender;
-	if (SameValue(LTrackBar->Frequency, 1.f, (float) TEpsilon_Position))
+	if (SameValue(LTrackBar->Frequency, 1.0, (double) TEpsilon_Position))
 		dynamic_cast<TFloatValue*>(FItems[LTrackBar->Tag].Data.Value.get())->Value = round(LTrackBar->Value);
 	else
 		dynamic_cast<TFloatValue*>(FItems[LTrackBar->Tag].Data.Value.get())->Value = LTrackBar->Value;

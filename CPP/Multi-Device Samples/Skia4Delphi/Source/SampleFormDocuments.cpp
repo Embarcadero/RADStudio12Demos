@@ -21,7 +21,7 @@
 
 void __fastcall TfrmDocuments::btnCreatePDFDrawingSVGClick(TObject* Sender)
 {
-	auto LSVGDOM = TSkSVGDOM::MakeFromFile(AssetsPath + "lion.svg");
+	auto LSVGDOM = TSkSVGDOM::MakeFromFile(AssetsPath + "knight.svg");
 	auto LSize = TSizeF(600, 600);
 	LSVGDOM->SetContainerSize(LSize);
 
@@ -48,7 +48,7 @@ void __fastcall TfrmDocuments::btnCreatePDFDrawingSVGClick(TObject* Sender)
 
 void __fastcall TfrmDocuments::btnCreateXPSDrawingSVGClick(TObject* Sender)
 {
-	auto LSVGDOM = TSkSVGDOM::MakeFromFile(AssetsPath + "lion.svg");
+	auto LSVGDOM = TSkSVGDOM::MakeFromFile(AssetsPath + "knight.svg");
 	auto LSize = TSizeF(600, 600);
 	LSVGDOM->SetContainerSize(LSize);
 

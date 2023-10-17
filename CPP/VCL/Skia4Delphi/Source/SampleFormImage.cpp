@@ -31,7 +31,7 @@ String FormatBytes(const int64_t ABytesCount)
 void __fastcall TfrmImage::pnlEncodeWebpVsJpegClick(TObject* Sender)
 {
 	static const int Quality = 80;
-	auto LImage = TSkImage::MakeFromEncodedFile(AssetsPath + "kung-fu-panda.png");
+	auto LImage = TSkImage::MakeFromEncodedFile(AssetsPath + "golden-pheasant.png");
 	TBytes LBytesWebP = LImage->Encode(TSkEncodedImageFormat::WEBP, Quality);
 	TBytes LBytesJpeg = LImage->Encode(TSkEncodedImageFormat::JPEG, Quality);
 
@@ -56,9 +56,9 @@ void __fastcall TfrmImage::pnlNinePatchClick(TObject* Sender)
 
 void __fastcall TfrmImage::pnlWebpInImageClick(TObject* Sender)
 {
-	ChildForm<TfrmTImageViewer>()->Show("Loading .WebP in TImage", "Skia4Delphi adds support for new formats to TBitmap: .bmp, .gif, .ico, .webp, .wbmp and raw images (.arw, .cr2, .dng, .nef, .nrw, .orf, .raf, .rw2, .pef and .srw)",
+	ChildForm<TfrmTImageViewer>()->Show("Loading .WebP in TImage", "Skia4Delphi adds support for new formats to TPicture: .bmp, .gif, .ico, .webp, .wbmp and raw images (.arw, .cr2, .dng, .nef, .nrw, .orf, .raf, .rw2, .pef and .srw)",
 		[this](TImage* AImage) {
-			AImage->Picture->LoadFromFile(AssetsPath + "kung-fu-panda.webp");
+			AImage->Picture->LoadFromFile(AssetsPath + "golden-pheasant.webp");
 		});
 }
 //---------------------------------------------------------------------------
