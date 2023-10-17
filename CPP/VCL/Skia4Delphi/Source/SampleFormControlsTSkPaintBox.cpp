@@ -128,7 +128,7 @@ void __fastcall TFreehandRender::OnMouseMove(TObject* ASender,
 	TShiftState AShift, int X, int Y)
 {
 	static const int MinPointsDistance = 5;
-	TPointF LPoint = PointF(X, Y);
+	TPointF LPoint = PointF(X, Y) / ((TSkPaintBox*) ASender)->ScaleFactor;
 	if (FPressed && (FPathBuilder) && (FLastPoint.Distance(LPoint) >= MinPointsDistance)) {
 		FCurrentPath = nullptr;
 		FPathBuilder->LineTo(LPoint.X, LPoint.Y);
