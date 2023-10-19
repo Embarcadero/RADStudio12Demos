@@ -75,7 +75,6 @@
         <DCCReference Include="Main.pas">
             <Form>Form1</Form>
         </DCCReference>
-        <None Include="Readme.html"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

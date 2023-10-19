@@ -140,7 +140,6 @@
             <DependentOn>MainForm.h</DependentOn>
             <BuildOrder>2</BuildOrder>
         </CppCompile>
-        <None Include="Readme.html"/>
         <CppCompile Include="Threshold.cpp">
             <Form>Form4</Form>
             <DependentOn>Threshold.h</DependentOn>
