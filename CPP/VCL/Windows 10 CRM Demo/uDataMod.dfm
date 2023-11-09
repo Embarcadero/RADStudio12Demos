@@ -991,6 +991,7 @@ object DM: TDM
       0065007300}
   end
   object FDPhysSQLiteDriverLink1: TFDPhysSQLiteDriverLink
+    EngineLinkage = slFDEStatic
     Left = 616
     Top = 72
   end

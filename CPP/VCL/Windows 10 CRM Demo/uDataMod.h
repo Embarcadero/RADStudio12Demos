@@ -18,7 +18,7 @@
 #include <FireDAC.Phys.SQLite.hpp>
 #include <FireDAC.Phys.SQLiteDef.hpp>
 #include <FireDAC.Phys.SQLiteVDataSet.hpp>
-#include <FireDAC.Phys.SQLiteWrapper.Stat.hpp>
+#include <FireDAC.Phys.SQLiteWrapper.FDEStat.hpp>
 #include <FireDAC.Stan.Async.hpp>
 #include <FireDAC.Stan.Def.hpp>
 #include <FireDAC.Stan.Error.hpp>

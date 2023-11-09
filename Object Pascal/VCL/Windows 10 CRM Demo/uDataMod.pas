@@ -12,7 +12,7 @@ uses
   FireDAC.Phys.SQLite, FireDAC.VCLUI.Wait, FireDAC.DApt, System.Variants,
   FireDAC.Phys.SQLiteVDataSet, FireDAC.Comp.BatchMove.Text, System.IOUtils,
   FireDAC.Comp.BatchMove, FireDAC.Comp.BatchMove.DataSet, System.StrUtils,
-  FireDAC.Phys.SQLiteWrapper.Stat;
+  FireDAC.Phys.SQLiteWrapper.FDEStat;
 
 type
   TDM = class(TDataModule)
