@@ -45,7 +45,10 @@ __published:	// IDE-managed Components
 	void __fastcall BluetoothLE1EndDiscoverDevices(TObject * const Sender, TBluetoothLEDeviceList * const ADeviceList);
 	void __fastcall BluetoothLE1ServicesDiscovered(TObject * const Sender, TBluetoothGattServiceList * const AServiceList);
 private:	// User declarations
-    String FLocationPermission;
+    const String LOCATION_PERMISSION = "android.permission.ACCESS_FINE_LOCATION";
+    const String BLUETOOTH_SCAN_PERMISSION = "android.permission.BLUETOOTH_SCAN";
+    const String BLUETOOTH_CONNECT_PERMISSION = "android.permission.BLUETOOTH_CONNECT";
+
 	bool Scanning;
 	DWORD ScanningStart;
     void StartBLEDiscovery();

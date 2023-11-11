@@ -250,17 +250,16 @@ begin
   EnableRSSIMonitorize(False);
 
   if TOSVersion.Check(12) then
-    Permissions := [LOCATION_PERMISSION, BLUETOOTH_SCAN_PERMISSION, BLUETOOTH_ADVERTISE_PERMISSION, BLUETOOTH_CONNECT_PERMISSION]
+    Permissions := [LOCATION_PERMISSION, BLUETOOTH_SCAN_PERMISSION, BLUETOOTH_CONNECT_PERMISSION]
   else
     Permissions := [LOCATION_PERMISSION];
 
   PermissionsService.RequestPermissions(Permissions,
     procedure(const Permissions: TClassicStringDynArray; const GrantResults: TClassicPermissionStatusDynArray)
     begin
-      if ((Length(GrantResults) = 4) and (GrantResults[0] = TPermissionStatus.Granted)
+      if ((Length(GrantResults) = 3) and (GrantResults[0] = TPermissionStatus.Granted)
                                      and (GrantResults[1] = TPermissionStatus.Granted)
-                                     and (GrantResults[2] = TPermissionStatus.Granted)
-                                     and (GrantResults[3] = TPermissionStatus.Granted)) or
+                                     and (GrantResults[2] = TPermissionStatus.Granted)) or
          ((Length(GrantResults) = 1) and (GrantResults[0] = TPermissionStatus.Granted)) then
       begin
         lblDevice.Text := 'Scanning for devices';

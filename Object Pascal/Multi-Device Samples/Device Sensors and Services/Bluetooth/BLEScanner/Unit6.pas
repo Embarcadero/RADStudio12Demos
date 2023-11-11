@@ -37,12 +37,14 @@ type
     procedure FormShow(Sender: TObject);
     procedure BluetoothLE1ServicesDiscovered(const Sender: TObject; const AServiceList: TBluetoothGattServiceList);
     procedure ListBox1ItemClick(const Sender: TCustomListBox; const Item: TListBoxItem);
-    procedure FormCreate(Sender: TObject);
+  private const
+    LOCATION_PERMISSION = 'android.permission.ACCESS_FINE_LOCATION';
+    BLUETOOTH_SCAN_PERMISSION = 'android.permission.BLUETOOTH_SCAN';
+    BLUETOOTH_CONNECT_PERMISSION = 'android.permission.BLUETOOTH_CONNECT';
   private
     { Private declarations }
     Scanning: Boolean;
     ScanningStart: Cardinal;
-    FLocationPermission: string;
     procedure RequestPermissionsResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
     procedure DisplayRationale(Sender: TObject; const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc);
     procedure StartBLEDiscovery;
@@ -60,11 +62,6 @@ var
 implementation
 
 uses
-{$IFDEF ANDROID}
-  Androidapi.Helpers,
-  Androidapi.JNI.JavaTypes,
-  Androidapi.JNI.Os,
-{$ENDIF}
   FMX.DialogService;
 
 {$R *.fmx}
@@ -131,20 +128,20 @@ begin
 end;
 
 procedure TForm6.btnStartScanClick(Sender: TObject);
+var
+  Permissions: TArray<string>;
 begin
-  PermissionsService.RequestPermissions([FLocationPermission], RequestPermissionsResult, DisplayRationale);
+  if TOSVersion.Check(12) then
+    Permissions := [LOCATION_PERMISSION, BLUETOOTH_SCAN_PERMISSION, BLUETOOTH_CONNECT_PERMISSION]
+  else
+    Permissions := [LOCATION_PERMISSION];
+
+  PermissionsService.RequestPermissions(Permissions, RequestPermissionsResult, DisplayRationale);
 end;
 
 procedure TForm6.btnStopScanClick(Sender: TObject);
 begin
   StopBLEDiscovery
-end;
-
-procedure TForm6.FormCreate(Sender: TObject);
-begin
-{$IFDEF ANDROID}
-  FLocationPermission := JStringToString(TJManifest_permission.JavaClass.ACCESS_FINE_LOCATION);
-{$ENDIF}
 end;
 
 procedure TForm6.FormShow(Sender: TObject);
@@ -182,11 +179,13 @@ end;
 
 procedure TForm6.RequestPermissionsResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
 begin
-  // 1 permissions involved: ACCESS_FINE_LOCATION
-  if (Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted) then
+  if ((Length(AGrantResults) = 3) and (AGrantResults[0] = TPermissionStatus.Granted)
+                                  and (AGrantResults[1] = TPermissionStatus.Granted)
+                                  and (AGrantResults[2] = TPermissionStatus.Granted)) or
+     ((Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted)) then
     StartBLEDiscovery
   else
-    TDialogService.ShowMessage('Cannot start BLE scan as the permission has not been granted');
+    TDialogService.ShowMessage('Cannot start BLE scan because not all required permissions have been granted');
 end;
 
 procedure TForm6.StartBLEDiscovery;

@@ -12,10 +12,6 @@
 // and support agreement. 
 //---------------------------------------------------------------------------
 #include <fmx.h>
-#ifdef __ANDROID__
-    #include <Androidapi.Helpers.hpp>
-    #include <Androidapi.JNI.Os.hpp>
-#endif
 #include <FMX.DialogService.hpp>
 #pragma hdrstop
 
@@ -51,9 +47,6 @@ void __fastcall TTPDiscoverServices::Invoke(void)
 __fastcall TForm6::TForm6(TComponent* Owner)
 	: TForm(Owner)
 {
-#ifdef __ANDROID__
-    FLocationPermission = JStringToString(TJManifest_permission::JavaClass->ACCESS_FINE_LOCATION);
-#endif
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm6::DisplayRationale(TObject* Sender, const TClassicStringDynArray APermissions, const _di_TProc APostRationaleProc)
@@ -69,18 +62,33 @@ void __fastcall TForm6::DisplayRationale(TObject* Sender, const TClassicStringDy
 //---------------------------------------------------------------------------
 void __fastcall TForm6::RequestPermissionsResult(TObject* Sender, const TClassicStringDynArray APermissions, const TClassicPermissionStatusDynArray AGrantResults)
 {
-    // 1 permission involved: ACCESS_FINE_LOCATION
-	if ((AGrantResults.Length == 1) && (AGrantResults[0] == TPermissionStatus::Granted))
-		StartBLEDiscovery();
-	else
-		ShowMessage("Cannot start BLE scan as the permission was not granted");
+    if ((AGrantResults.Length == 3 && AGrantResults[0] == TPermissionStatus::Granted
+                                   && AGrantResults[1] == TPermissionStatus::Granted
+                                   && AGrantResults[2] == TPermissionStatus::Granted) ||
+        (AGrantResults.Length == 1 && AGrantResults[0] == TPermissionStatus::Granted))
+    {
+        StartBLEDiscovery();
+    }
+    else
+    {
+        ShowMessage("Cannot start BLE scan because not all required permissions have been granted");
+    }
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm6::btnStartScanClick(TObject *Sender)
 {
-    DynamicArray<String> perms { FLocationPermission };
+    DynamicArray<String> permissions;
 
-    PermissionsService()->RequestPermissions(perms, RequestPermissionsResult, DisplayRationale);
+    if (TOSVersion::Check(12))
+    {
+        permissions = { LOCATION_PERMISSION, BLUETOOTH_SCAN_PERMISSION, BLUETOOTH_CONNECT_PERMISSION };
+    }
+    else
+    {
+        permissions = { LOCATION_PERMISSION };
+    }
+
+    PermissionsService()->RequestPermissions(permissions, RequestPermissionsResult, DisplayRationale);
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm6::btnStopScanClick(TObject *Sender)

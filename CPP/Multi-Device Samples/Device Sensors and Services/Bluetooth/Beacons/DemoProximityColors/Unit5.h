@@ -44,7 +44,6 @@ __published:	// IDE-managed Components
 private:	// User declarations
 	const String LOCATION_PERMISSION = "android.permission.ACCESS_FINE_LOCATION";
 	const String BLUETOOTH_SCAN_PERMISSION = "android.permission.BLUETOOTH_SCAN";
-	const String BLUETOOTH_ADVERTISE_PERMISSION = "android.permission.BLUETOOTH_ADVERTISE";
 	const String BLUETOOTH_CONNECT_PERMISSION = "android.permission.BLUETOOTH_CONNECT";
 
 	System::Boolean FisScanning;

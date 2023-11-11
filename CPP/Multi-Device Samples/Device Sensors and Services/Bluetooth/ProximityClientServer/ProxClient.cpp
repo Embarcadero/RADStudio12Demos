@@ -194,7 +194,7 @@ void __fastcall TfrmProximityForm::DoScan()
 
   if (TOSVersion::Check(12))
   {
-    permissions = { LOCATION_PERMISSION, BLUETOOTH_SCAN_PERMISSION, BLUETOOTH_ADVERTISE_PERMISSION, BLUETOOTH_CONNECT_PERMISSION };
+    permissions = { LOCATION_PERMISSION, BLUETOOTH_SCAN_PERMISSION, BLUETOOTH_CONNECT_PERMISSION };
   }
   else
   {
@@ -204,10 +204,9 @@ void __fastcall TfrmProximityForm::DoScan()
   PermissionsService()->RequestPermissions(permissions,
     [this](const TClassicStringDynArray Permissions, const TClassicPermissionStatusDynArray GrantResults)
     {
-      if ((GrantResults.Length == 4 && GrantResults[0] == TPermissionStatus::Granted
+      if ((GrantResults.Length == 3 && GrantResults[0] == TPermissionStatus::Granted
                                     && GrantResults[1] == TPermissionStatus::Granted
-                                    && GrantResults[2] == TPermissionStatus::Granted
-                                    && GrantResults[3] == TPermissionStatus::Granted) ||
+                                    && GrantResults[2] == TPermissionStatus::Granted) ||
           (GrantResults.Length == 1 && GrantResults[0] == TPermissionStatus::Granted))
       {
         lblDevice->Text = "Scanning for devices";

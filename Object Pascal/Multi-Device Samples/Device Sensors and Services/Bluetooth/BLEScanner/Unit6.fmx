@@ -7,7 +7,6 @@ object Form6: TForm6
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
-  OnCreate = FormCreate
   OnShow = FormShow
   DesignerMasterStyle = 3
   object Panel1: TPanel
