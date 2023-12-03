@@ -10,10 +10,6 @@
 //---------------------------------------------------------------------------
 
 #include <fmx.h>
-#ifdef __ANDROID__
-#include <Androidapi.Helpers.hpp>
-#include <Androidapi.JNI.Os.hpp>
-#endif
 #include <FMX.DialogService.hpp>
 #pragma hdrstop
 
@@ -34,11 +30,6 @@ TBaseMainForm *BaseMainForm;
 //---------------------------------------------------------------------------
 __fastcall TBaseMainForm::TBaseMainForm(TComponent *Owner) : TForm(Owner)
 {
-#ifdef __ANDROID__
-	FPermissionCamera = JStringToString(TJManifest_permission::JavaClass->CAMERA);
-	FPermissionReadExternalStorage = JStringToString(TJManifest_permission::JavaClass->READ_EXTERNAL_STORAGE);
-	FPermissionWriteExternalStorage = JStringToString(TJManifest_permission::JavaClass->WRITE_EXTERNAL_STORAGE);
-#endif
 	FRawBitmap = new TBitmap(0, 0);
 }
 //---------------------------------------------------------------------------
@@ -49,43 +40,21 @@ __fastcall TBaseMainForm::~TBaseMainForm()
 //---------------------------------------------------------------------------
 void __fastcall TBaseMainForm::DisplayRationale(TObject *Sender, const TClassicStringDynArray APermissions, const _di_TProc APostRationaleProc)
 {
-	String RationaleMsg;
-
-	for (int i = 0; i < APermissions.Length; i++) {
-		if (APermissions[i] == FPermissionCamera)
-			RationaleMsg = RationaleMsg + "The app needs to access the camera to take a photo" + sLineBreak + sLineBreak;
-		else if (APermissions[i] == FPermissionReadExternalStorage)
-			RationaleMsg = RationaleMsg + "The app needs to load photo files from your device";
-	}
-
 	// Show an explanation to the user *asynchronously* - don't block this thread waiting for the user's response!
 	// After the user sees the explanation, invoke the post-rationale routine to request the permissions
-	TDialogService::ShowMessage(RationaleMsg,
+	TDialogService::ShowMessage("The app needs to access the device's storage to save the photos",
     	[APostRationaleProc](TModalResult AKey)
 		{
         	APostRationaleProc->Invoke();
         });
 }
 //---------------------------------------------------------------------------
-void __fastcall TBaseMainForm::LoadPicturePermissionRequestResult(TObject *Sender, const TClassicStringDynArray APermissions, const TClassicPermissionStatusDynArray AGrantResults) {
-	// 2 permissions involved: READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE
-	if ((AGrantResults.Length == 2) &&
-		(AGrantResults[0] == TPermissionStatus::Granted) &&
-		(AGrantResults[1] == TPermissionStatus::Granted))
-		ActionTakePhotoFromLibrary->Execute();
-	else
-		TDialogService::ShowMessage("Cannot do photo editing because the required permissions are not granted");
-}
-//---------------------------------------------------------------------------
 void __fastcall TBaseMainForm::TakePicturePermissionRequestResult(TObject *Sender, const TClassicStringDynArray APermissions, const TClassicPermissionStatusDynArray AGrantResults) {
-	// 3 permissions involved: CAMERA, READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE
-	if ((AGrantResults.Length == 3) &&
-		(AGrantResults[0] == TPermissionStatus::Granted) &&
-		(AGrantResults[1] == TPermissionStatus::Granted) &&
-		(AGrantResults[2] == TPermissionStatus::Granted))
+	// 1 permission involved: WRITE_EXTERNAL_STORAGE
+	if (AGrantResults.Length == 1 && AGrantResults[0] == TPermissionStatus::Granted)
 		ActionTakePhotoFromCamera->Execute();
 	else
-		TDialogService::ShowMessage("Cannot take picture because the required permissions are not granted");
+		TDialogService::ShowMessage("Cannot take photos because the required permission has not been granted");
 }
 //---------------------------------------------------------------------------
 void __fastcall TBaseMainForm::UpdateEffect()
@@ -250,17 +219,15 @@ void __fastcall TBaseMainForm::FilterComboBoxChange(TObject *Sender)
 		ActionSharpenEffect->Execute();
 }
 //---------------------------------------------------------------------------
-void __fastcall TBaseMainForm::ButtonTakePhotoFromLibraryClick(TObject *Sender)
-{
-	DynamicArray<String> permissions { FPermissionReadExternalStorage, FPermissionWriteExternalStorage };
-
-	PermissionsService()->RequestPermissions(permissions, LoadPicturePermissionRequestResult, DisplayRationale);
-}
-//---------------------------------------------------------------------------
 void __fastcall TBaseMainForm::ButtonTakePhotoFromCameraClick(TObject *Sender)
 {
-	DynamicArray<String> permissions { FPermissionCamera, FPermissionReadExternalStorage, FPermissionWriteExternalStorage };
-
-	PermissionsService()->RequestPermissions(permissions, TakePicturePermissionRequestResult, DisplayRationale);
+    if (TOSVersion::Check(11))
+    {
+        ActionTakePhotoFromCamera->Execute();
+    }
+    else
+    {
+        PermissionsService()->RequestPermissions({ STORAGE_PERMISSION }, TakePicturePermissionRequestResult, DisplayRationale);
+    }
 }
 //---------------------------------------------------------------------------

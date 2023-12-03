@@ -25,6 +25,8 @@
 #include <FMX.Types.hpp>
 #include <FMX.Controls.Presentation.hpp>
 #include <FMX.ListBox.hpp>
+#include <FMX.Graphics.hpp>
+#include <FMX.MediaLibrary.hpp>
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -71,16 +73,12 @@ __published:	// IDE-managed Components
 	void __fastcall ActionPaperSketchEffectExecute(TObject *Sender);
 	void __fastcall FormCreate(TObject *Sender);
 	void __fastcall FilterComboBoxChange(TObject *Sender);
-    void __fastcall ButtonTakePhotoFromLibraryClick(TObject *Sender);
     void __fastcall ButtonTakePhotoFromCameraClick(TObject *Sender);
 private:	// User declarations
-    String FPermissionCamera;
-    String FPermissionReadExternalStorage;
-    String FPermissionWriteExternalStorage;
+    const String STORAGE_PERMISSION = "android.permission.WRITE_EXTERNAL_STORAGE";
     TBitmap *FRawBitmap;
 	TFilter *FEffect;
 	void __fastcall DisplayRationale(TObject *Sender, const TClassicStringDynArray APermissions, const _di_TProc APostRationaleProc);
-	void __fastcall LoadPicturePermissionRequestResult(TObject *Sender, const TClassicStringDynArray APermissions, const TClassicPermissionStatusDynArray AGrantResults);
 	void __fastcall TakePicturePermissionRequestResult(TObject *Sender, const TClassicStringDynArray APermissions, const TClassicPermissionStatusDynArray AGrantResults);
 	void __fastcall DoOnChangedEffectParam(TObject *Sender);
 	void __fastcall LoadFilterSettings(TFilterRec Rec);

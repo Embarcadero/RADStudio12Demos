@@ -36,6 +36,9 @@ type
     Label2: TLabel;
     procedure BtnStartAnnounceClick(Sender: TObject);
     procedure UpdateTextAndSwitch;
+  private const
+    BLUETOOTH_ADVERTISE_PERMISSION = 'android.permission.BLUETOOTH_ADVERTISE';
+    BLUETOOTH_CONNECT_PERMISSION = 'android.permission.BLUETOOTH_CONNECT';
   private
     { Private declarations }
     FBluetoothManagerLE: TBluetoothLEManager;
@@ -54,6 +57,7 @@ type
       var AGattStatus: TBluetoothGattStatus);
     procedure MyWriteEvent(const Sender: TObject; const ACharacteristic: TBluetoothGattCharacteristic;
       var AGattStatus: TBluetoothGattStatus; const AValue: TByteDynArray);
+    procedure StartAnnounce;
   public
     { Public declarations }
   end;
@@ -64,6 +68,9 @@ var
 implementation
 
 {$R *.fmx}
+
+uses
+  System.Permissions;
 
 //  (Name: 'Alert Level'; UUID:'{00002A06-0000-1000-8000-00805F9B34FB}'),
 //  (Name: 'LINK LOSS'; UUID:'{00001803-0000-1000-8000-00805F9B34FB}'),
@@ -88,6 +95,21 @@ const
 
 {Publish service}
 procedure TForm4.BtnStartAnnounceClick(Sender: TObject);
+begin
+  if TOSVersion.Check(12) then
+  begin
+    PermissionsService.RequestPermissions([BLUETOOTH_ADVERTISE_PERMISSION, BLUETOOTH_CONNECT_PERMISSION],
+      procedure(const Permissions: TClassicStringDynArray; const GrantResults: TClassicPermissionStatusDynArray)
+      begin
+        if (Length(GrantResults) = 2) and (GrantResults[0] = TPermissionStatus.Granted) and (GrantResults[1] = TPermissionStatus.Granted) then
+          StartAnnounce;
+      end);
+  end
+  else
+    StartAnnounce;
+end;
+
+procedure TForm4.StartAnnounce;
 var
   CharValue: TBytes;
 begin

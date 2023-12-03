@@ -79,6 +79,7 @@ object BaseMainForm: TBaseMainForm
     Size.PlatformDefault = False
     TabOrder = 2
     object ButtonTakePhotoFromLibrary: TButton
+      Action = ActionTakePhotoFromLibrary
       Align = Right
       Position.X = 722.000000000000000000
       Size.Width = 48.000000000000000000
@@ -86,8 +87,6 @@ object BaseMainForm: TBaseMainForm
       Size.PlatformDefault = False
       StyleLookup = 'organizetoolbutton'
       TabOrder = 0
-      Text = ' '
-      OnClick = ButtonTakePhotoFromLibraryClick
     end
     object FilterComboBox: TComboBox
       Align = Client

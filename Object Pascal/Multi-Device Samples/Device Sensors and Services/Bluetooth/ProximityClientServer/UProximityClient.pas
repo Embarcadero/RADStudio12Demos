@@ -54,7 +54,6 @@ type
   private const
     LOCATION_PERMISSION = 'android.permission.ACCESS_FINE_LOCATION';
     BLUETOOTH_SCAN_PERMISSION = 'android.permission.BLUETOOTH_SCAN';
-    BLUETOOTH_ADVERTISE_PERMISSION = 'android.permission.BLUETOOTH_ADVERTISE';
     BLUETOOTH_CONNECT_PERMISSION = 'android.permission.BLUETOOTH_CONNECT';
   private
     { Private declarations }

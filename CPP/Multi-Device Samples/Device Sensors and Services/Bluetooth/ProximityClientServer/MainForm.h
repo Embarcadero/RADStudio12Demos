@@ -43,6 +43,9 @@ __published:	// IDE-managed Components
 	void __fastcall StartAnnounceClick(TObject *Sender);
 	void __fastcall FormShow(TObject *Sender);
 private:	// User declarations
+    const String BLUETOOTH_ADVERTISE_PERMISSION = "android.permission.BLUETOOTH_ADVERTISE";
+    const String BLUETOOTH_CONNECT_PERMISSION = "android.permission.BLUETOOTH_CONNECT";
+
 	TBluetoothLEDevice *FBluetoothLEDevice;
 	TBluetoothLEManager *FBluetoothManagerLE;
 	TBluetoothGattServer *FGattServer;
@@ -68,6 +71,7 @@ private:	// User declarations
 								TBluetoothGattStatus *AGattStatus, TBytes AValue);
 	void __fastcall UpdateTextAndSwitch();
 	String __fastcall BytesToString(TBytes B);
+    void StartAnnounce();
 public:		// User declarations
 	__fastcall TForm4(TComponent* Owner);
 };

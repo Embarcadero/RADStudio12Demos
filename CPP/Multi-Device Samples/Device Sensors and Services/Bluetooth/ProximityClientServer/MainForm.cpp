@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 
 #include <fmx.h>
+#include <System.Permissions.hpp>
 #pragma hdrstop
 
 #include "MainForm.h"
@@ -42,7 +43,27 @@ __fastcall TForm4::TForm4(TComponent* Owner) : TForm(Owner) {
 }
 
 // ---------------------------------------------------------------------------
-void __fastcall TForm4::StartAnnounceClick(TObject *Sender) {
+void __fastcall TForm4::StartAnnounceClick(TObject *Sender)
+{
+    if (TOSVersion::Check(12))
+    {
+        PermissionsService()->RequestPermissions({ BLUETOOTH_ADVERTISE_PERMISSION, BLUETOOTH_CONNECT_PERMISSION },
+            [this](const TClassicStringDynArray Permissions, const TClassicPermissionStatusDynArray GrantResults)
+            {
+                if (GrantResults.Length == 2 && GrantResults[0] == TPermissionStatus::Granted && GrantResults[1] == TPermissionStatus::Granted)
+                {
+                    StartAnnounce();
+                }
+            });
+    }
+    else
+    {
+        StartAnnounce();
+    }
+}
+
+void TForm4::StartAnnounce()
+{
   Integer I;
   TBytes CharValue;
   TBluetoothGattCharacteristic *LCharacteristic;

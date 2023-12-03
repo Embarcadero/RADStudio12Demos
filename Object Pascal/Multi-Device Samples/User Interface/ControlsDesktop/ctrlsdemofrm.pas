@@ -22,7 +22,7 @@ uses
   FMX.Memo, FMX.Colors, FMX.Menus, FMX.Layers3D, FMX.Types3D, FMX.Controls3D, FMX.StdCtrls,
   FMX.DateTimeCtrls, FMX.ComboTrackBar, FMX.ComboEdit, FMX.SpinBox, FMX.Calendar, FMX.EditBox, FMX.NumberBox,
   FMX.Controls.Presentation, Data.Bind.EngExt, Fmx.Bind.DBEngExt, System.Rtti, System.Bindings.Outputs,
-  Fmx.Bind.Editors, Data.Bind.Components, FMX.ScrollBox, System.Threading, FMX.Graphics, System.UITypes;
+  Fmx.Bind.Editors, Data.Bind.Components, FMX.ScrollBox, System.Threading, FMX.Graphics, System.UITypes, FMX.Memo.Types;
 
 type
 
