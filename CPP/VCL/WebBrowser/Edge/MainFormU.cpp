@@ -235,7 +235,7 @@ void __fastcall TfrmMain::mniWindowCreateNewWindowClick(TObject *Sender)
     TForm *Form = new TfrmMain(Application);
     // Bypass the default behaviour of any form being kept above the main form like a tool window.
     // However by so doing we lose the form if it gets minimised, so stop that possibility.
-    SetWindowLongPtr(Form->Handle, GWLP_HWNDPARENT, (long)(Application->Handle));
+    SetWindowLongPtr(Form->Handle, GWLP_HWNDPARENT, (LONG_PTR)(Application->Handle));
     Form->BorderIcons = TBorderIcons(Form->BorderIcons) >> biMinimize;
     Form->Show();
 }
