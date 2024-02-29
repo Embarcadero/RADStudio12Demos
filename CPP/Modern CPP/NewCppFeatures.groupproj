@@ -21,9 +21,6 @@
         <Projects Include="CppStringView\CppStringView.cbproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="Cpp17Misc\Cpp17Misc.cbproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="CppStructuredBindings\CppStructuredBindings.cbproj">
             <Dependencies/>
         </Projects>
@@ -92,15 +89,6 @@
     <Target Name="CppStringView:Make">
         <MSBuild Projects="CppStringView\CppStringView.cbproj" Targets="Make"/>
     </Target>
-    <Target Name="Cpp17Misc">
-        <MSBuild Projects="Cpp17Misc\Cpp17Misc.cbproj"/>
-    </Target>
-    <Target Name="Cpp17Misc:Clean">
-        <MSBuild Projects="Cpp17Misc\Cpp17Misc.cbproj" Targets="Clean"/>
-    </Target>
-    <Target Name="Cpp17Misc:Make">
-        <MSBuild Projects="Cpp17Misc\Cpp17Misc.cbproj" Targets="Make"/>
-    </Target>
     <Target Name="CppStructuredBindings">
         <MSBuild Projects="CppStructuredBindings\CppStructuredBindings.cbproj"/>
     </Target>
@@ -120,13 +108,13 @@
         <MSBuild Projects="CppReturnTypeDeduction\CppReturnTypeDeduction.cbproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="CppGenericLambdas;CppInitializingLambdaCaptures;CppConstExpr;CppIfInit;CppConstExprIf;CppStringView;Cpp17Misc;CppStructuredBindings;CppReturnTypeDeduction"/>
+        <CallTarget Targets="CppGenericLambdas;CppInitializingLambdaCaptures;CppConstExpr;CppIfInit;CppConstExprIf;CppStringView;CppStructuredBindings;CppReturnTypeDeduction"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="CppGenericLambdas:Clean;CppInitializingLambdaCaptures:Clean;CppConstExpr:Clean;CppIfInit:Clean;CppConstExprIf:Clean;CppStringView:Clean;Cpp17Misc:Clean;CppStructuredBindings:Clean;CppReturnTypeDeduction:Clean"/>
+        <CallTarget Targets="CppGenericLambdas:Clean;CppInitializingLambdaCaptures:Clean;CppConstExpr:Clean;CppIfInit:Clean;CppConstExprIf:Clean;CppStringView:Clean;CppStructuredBindings:Clean;CppReturnTypeDeduction:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="CppGenericLambdas:Make;CppInitializingLambdaCaptures:Make;CppConstExpr:Make;CppIfInit:Make;CppConstExprIf:Make;CppStringView:Make;Cpp17Misc:Make;CppStructuredBindings:Make;CppReturnTypeDeduction:Make"/>
+        <CallTarget Targets="CppGenericLambdas:Make;CppInitializingLambdaCaptures:Make;CppConstExpr:Make;CppIfInit:Make;CppConstExprIf:Make;CppStringView:Make;CppStructuredBindings:Make;CppReturnTypeDeduction:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
