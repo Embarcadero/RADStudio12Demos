@@ -874,11 +874,7 @@ void __fastcall TfrmMain::EdgeBrowserExecuteScript(TCustomEdgeBrowser* Sender, H
 
 bool ShouldBlockURI(String Uri)
 {
-#ifdef __clang__
     std::unique_ptr<TIdURI> URI(new TIdURI(Uri));
-#else
-    std::auto_ptr<TIdURI> URI(new TIdURI(Uri));
-#endif
     // For no particular reason, block Google's main English sites
     String Host = URI->Host.LowerCase();
     if (EndsStr(L"yahoo.com", Host) || EndsStr(L"yahoo.co.uk", Host))

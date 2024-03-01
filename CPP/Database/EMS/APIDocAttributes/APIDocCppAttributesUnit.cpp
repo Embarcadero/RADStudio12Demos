@@ -505,7 +505,7 @@ System::String initJSONDefinitions()
 static void Register()
 {
 
-		std::auto_ptr<TEMSResourceAttributes> attributes(new TEMSResourceAttributes());
+		std::unique_ptr<TEMSResourceAttributes> attributes(new TEMSResourceAttributes());
 		attributes->ResourceName = "SampleAttributesCpp";
 
 		//YAML definitions

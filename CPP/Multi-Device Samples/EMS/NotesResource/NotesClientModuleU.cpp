@@ -73,7 +73,7 @@ void __fastcall TNotesClientModule::Signup(const String & AUserName, const Strin
 void __fastcall TNotesClientModule::AddNote(const TNote * ANote, String &AID)
 {
 	TBackendEndpoint * lEndpoint = BackendEndpointAddNote;
-	std::auto_ptr<TJSONObject> ljsonObj(TNoteJSON::NoteToJSON(ANote));
+	std::unique_ptr<TJSONObject> ljsonObj(TNoteJSON::NoteToJSON(ANote));
 	lEndpoint->ClearBody();
 	lEndpoint->AddBody(ljsonObj.get());
 	lEndpoint->Execute();
@@ -135,7 +135,7 @@ void __fastcall TNotesClientModule::UpdateNote(const TNote * ANote)
 {
 	TBackendEndpoint * lEndpoint = BackendEndpointUpdateNote;
 	lEndpoint->Params->Items[0]->Value = ANote->ID;
-	std::auto_ptr<TJSONObject> ljsonObj(TNoteJSON::NoteToJSON(ANote));
+	std::unique_ptr<TJSONObject> ljsonObj(TNoteJSON::NoteToJSON(ANote));
 	lEndpoint->ClearBody();
 	lEndpoint->AddBody(ljsonObj.get());
 	lEndpoint->Execute();

@@ -10,7 +10,7 @@
 //---------------------------------------------------------------------------
 
 #pragma hdrstop
-#include <memory>       //for STL auto_ptr
+#include <memory>       //for STL unique_ptr
 #include "ibreg.h"
 #include "samp.h"
 
@@ -29,7 +29,7 @@ __fastcall TIBEventListProperty::~TIBEventListProperty(void){}
 
 void __fastcall TIBEventListProperty::Edit()
 {
-  std::auto_ptr<TStringList> Events(new TStringList());
+  std::unique_ptr<TStringList> Events(new TStringList());
   Events->Assign((TStrings*)GetOrdValue());
   if(Ibevnts::EditAlerterEvents(Events.get()))
     SetOrdValue(long(Events.get()));

@@ -27,7 +27,7 @@ namespace Resourcemoduleu
 {
 	void __fastcall PACKAGE Register()
 	{
-		std::auto_ptr<TEMSResourceAttributes> attributes(new TEMSResourceAttributes());
+		std::unique_ptr<TEMSResourceAttributes> attributes(new TEMSResourceAttributes());
 		attributes->ResourceName = "test";
 		attributes->ResourceSuffix["EMSDataSetResource1"] = "/";
 		RegisterResource(__typeinfo(TResourceModule), attributes.release());

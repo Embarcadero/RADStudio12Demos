@@ -22,7 +22,7 @@
 #pragma explicit_rtti methods () properties (public) fields()
 class TNoteWrapper : public TObject {
 private:
-	std::auto_ptr<TNote> FNote;
+	std::unique_ptr<TNote> FNote;
 	inline String __fastcall GetContent(void){ return FNote->Content;}
 	inline String __fastcall GetID(void) { return FNote->ID;}
 	inline String __fastcall GetTitle(void) { return FNote->Title;}

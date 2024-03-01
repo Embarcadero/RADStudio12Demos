@@ -17,7 +17,7 @@
 
 // ---------------------------------------------------------------------------
 String __fastcall TNotesStorage::DecodeMultilineText(const String & AText) {
-	std::auto_ptr<TStringBuilder> lBuilder(new TStringBuilder());
+	std::unique_ptr<TStringBuilder> lBuilder(new TStringBuilder());
 	String _return = "";
 	int i = 1;
 	while(i <= AText.Length()) {
@@ -46,7 +46,7 @@ String __fastcall TNotesStorage::DecodeMultilineText(const String & AText) {
 }
 // ---------------------------------------------------------------------------
 String __fastcall TNotesStorage::EncodeMultilineText(const String & AText) {
-	std::auto_ptr<TStringBuilder> lBuilder(new TStringBuilder());
+	std::unique_ptr<TStringBuilder> lBuilder(new TStringBuilder());
 	String _return = "";
 	for(int i = 1; i <= AText.Length(); i++)
 	{

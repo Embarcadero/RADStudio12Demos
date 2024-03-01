@@ -69,8 +69,8 @@ Longint __fastcall TCGauge::GetPercentDone()
 
 void __fastcall TCGauge::Paint()
 {
-  std::auto_ptr<Graphics::TBitmap> TheImage(new Graphics::TBitmap());
-  std::auto_ptr<TBltBitmap> OverlayImage(new TBltBitmap());
+  std::unique_ptr<Graphics::TBitmap> TheImage(new Graphics::TBitmap());
+  std::unique_ptr<TBltBitmap> OverlayImage(new TBltBitmap());
   TRect PaintTRect;
 
   TheImage->Height = Height;
@@ -118,7 +118,7 @@ void __fastcall TCGauge::PaintAsText(Graphics::TBitmap* AnImage, const TRect& Pa
 {
   String S;
   Integer X, Y;
-  std::auto_ptr<TBltBitmap> OverRect(new TBltBitmap);
+  std::unique_ptr<TBltBitmap> OverRect(new TBltBitmap);
 
   OverRect->MakeLike(AnImage);
   PaintBackground(OverRect.get());

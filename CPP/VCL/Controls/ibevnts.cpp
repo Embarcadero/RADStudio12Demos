@@ -14,7 +14,7 @@
 // no ramifications (there are sentries in the header file) but has been done
 // just to clarify that the function and class implementations in this file are
 // prototyped in INEVNTS.H
-#include <memory>     //for STL auto_ptr
+#include <memory>     //for STL unique_ptr
 #if !defined (REGISTER_ALL_CONTROLS)
   #include  "ibevnts.h"
 #else
@@ -28,7 +28,7 @@
 bool __fastcall Ibevnts::EditAlerterEvents(Classes::TStrings *Events)
 {
   bool result = false;
-  std::auto_ptr<TIBEAEventsEditor> EEditor(new TIBEAEventsEditor(Application));
+  std::unique_ptr<TIBEAEventsEditor> EEditor(new TIBEAEventsEditor(Application));
   for(int i=0; i < Events->Count ;i++) //
   {
     EEditor->cEvents->Cells[1][i] = Events->Strings[i];

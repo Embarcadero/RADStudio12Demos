@@ -88,7 +88,7 @@ void TCustomLoginResource::PostLogin(TEndpointContext* AContext, TEndpointReques
 
 static void Register()
 {
-	std::auto_ptr<TEMSResourceAttributes> attributes(new TEMSResourceAttributes());
+	std::unique_ptr<TEMSResourceAttributes> attributes(new TEMSResourceAttributes());
 	attributes->ResourceName = "CustomLogin";
 	attributes->ResourceSuffix["PostSignup"] = "signup";
 	attributes->EndPointName["PostSignup"] = "CustomSignupUser";

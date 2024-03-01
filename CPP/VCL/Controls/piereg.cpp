@@ -9,7 +9,7 @@
 
 //---------------------------------------------------------------------------
 
-#include <memory>          //For use of auto_ptr
+#include <memory>          //For use of unique_ptr
 #pragma hdrstop
 
 #include  "piereg.h"
@@ -89,10 +89,10 @@ __fastcall TAnglesProperty::~TAnglesProperty(void) { }
 
 void __fastcall TAnglesProperty::Edit()
 {
-  //We use the auto_ptr so that the object is destroyed automatically
+  //We use the unique_ptr so that the object is destroyed automatically
   //on exit of the function.
-  //  std::auto_ptr<TAngles> Angles(new TAngles());
-  std::auto_ptr<TAngleEditorDlg> AngleEditor(new TAngleEditorDlg(Application));
+  //  std::unique_ptr<TAngles> Angles(new TAngles());
+  std::unique_ptr<TAngleEditorDlg> AngleEditor(new TAngleEditorDlg(Application));
 
   AngleEditor->EditorAngles = (TAngles*)GetOrdValue();
   AngleEditor->ShowModal();

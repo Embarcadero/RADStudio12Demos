@@ -192,7 +192,7 @@ void __fastcall TLifeEngine::Clear(void)
 //---------------------------------------------------------------------------
 void __fastcall TLifeEngine::LoadPattern(const String AFileName)
 {
-	std::auto_ptr<TStream> Stream(new TFileStream(AFileName, fmOpenRead | fmShareDenyWrite));
+	std::unique_ptr<TStream> Stream(new TFileStream(AFileName, fmOpenRead | fmShareDenyWrite));
 	Stream->Seek(0,0);
 	LoadPattern(Stream.release());
 }
@@ -277,9 +277,9 @@ bool __fastcall TLifeEngine::ProcessPattern(TStrings * APattern, TStrings *AData
 //---------------------------------------------------------------------------
 void __fastcall TLifeEngine::LoadPattern(TStream *AStream)
 {
-	std::auto_ptr<TStringList> Pattern(new TStringList());
-	std::auto_ptr<TStringList> Data(new TStringList());
-	std::auto_ptr<TStringList> Description(new TStringList());
+	std::unique_ptr<TStringList> Pattern(new TStringList());
+	std::unique_ptr<TStringList> Data(new TStringList());
+	std::unique_ptr<TStringList> Description(new TStringList());
 	Pattern->LoadFromStream(AStream);
 	Pattern->Add("#E");
 	int CurLine = 0;

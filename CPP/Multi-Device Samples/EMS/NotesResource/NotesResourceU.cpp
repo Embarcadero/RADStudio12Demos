@@ -60,7 +60,7 @@ void TNotesResource1::Get(TEndpointContext* AContext, TEndpointRequest* ARequest
 	TEndpointResponse* AResponse)
 {
 	String LTitle = "";
-	std::auto_ptr<TNote> LNote(new TNote());
+	std::unique_ptr<TNote> LNote(new TNote());
 	std::vector<TNote*> * lNotes = NULL;
 	TJSONArray * lJson = NULL;
 	try {
@@ -91,7 +91,7 @@ void TNotesResource1::GetItem(TEndpointContext* AContext, TEndpointRequest* AReq
 {
 	try {
 		String lItem = ARequest->Params->Values["item"];
-		std::auto_ptr<TNote> lNote(new TNote());
+		std::unique_ptr<TNote> lNote(new TNote());
 		CheckNotesManager(AContext);
 		if(FNotesStorage->GetNote(lItem, lNote.get())) {
 			TJSONObject * jsonObj = TNoteJSON::NoteToJSON(lNote.get());
@@ -581,7 +581,7 @@ System::String initJSONDefinitions()
 namespace Notesresourceu
 {
 	void __fastcall PACKAGE Register() {
-		std::auto_ptr<TEMSResourceAttributes>attributes
+		std::unique_ptr<TEMSResourceAttributes>attributes
 			(new TEMSResourceAttributes());
 		attributes->ResourceName = "Notes";
 

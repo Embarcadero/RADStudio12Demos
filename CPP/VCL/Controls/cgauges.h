@@ -25,7 +25,7 @@
 //#include <Consts.hpp>
 #include <Vcl.Consts.hpp>
 #include <math.h>
-#include <memory>       //for auto_ptr STL class
+#include <memory>       //for unique_ptr STL class
 
 //-- type declarations -------------------------------------------------------
 enum TCGaugeKind { gkText, gkHorizontalBar, gkVerticalBar, gkPie, gkNeedle };
