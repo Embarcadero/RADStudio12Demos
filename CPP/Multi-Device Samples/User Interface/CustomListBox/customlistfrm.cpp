@@ -18,14 +18,6 @@
 #pragma package(smart_init)
 #pragma resource "*.fmx"
 
-long rndm(long max) {
-#if  defined __APPLE__ || defined __ANDROID__
-	return (random() % ((max + 1) + max));
-#else
-	return random(max);
-#endif
-}
-
 TfrmCustomList *frmCustomList;
 
 // ---------------------------------------------------------------------------

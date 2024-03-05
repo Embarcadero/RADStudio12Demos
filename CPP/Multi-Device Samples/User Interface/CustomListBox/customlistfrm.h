@@ -48,8 +48,6 @@ public:		// User declarations
 	__fastcall TfrmCustomList(TComponent* Owner);
 };
 
-long rndm(long max);
-
 //---------------------------------------------------------------------------
 extern PACKAGE TfrmCustomList *frmCustomList;
 //---------------------------------------------------------------------------
