@@ -317,8 +317,6 @@ object FormSharingComponent: TFormSharingComponent
       000000000000}
   end
   object SharingContract: TSharingContract
-    OnTransferImage = SharingContractTransferImage
-    OnAppChosen = SharingContractAppChosen
     Left = 156
   end
 end

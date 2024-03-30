@@ -20,9 +20,7 @@
 #include <Vcl.ExtCtrls.hpp>
 #include <Vcl.ImgList.hpp>
 #include <Vcl.ShareContract.hpp>
-#include <System.Win.ShareContract.hpp>
 //---------------------------------------------------------------------------
-//{$HPPEMIT 'using namespace Winapi::Applicationmodel::Datatransfer;'}
 class TFormSharingComponent : public TForm
 {
 __published:	// IDE-managed Components
@@ -48,11 +46,10 @@ __published:	// IDE-managed Components
 	TEdit *EditDataTitle;
 	TSharingContract *SharingContract;
 	void __fastcall ButtonShareClick(TObject *Sender);
-	void __fastcall SharingContractTransferImage(TObject * const Sender, IDataProviderRequest * const ARequest);
-	void __fastcall SharingContractAppChosen(TObject * const Sender, IDataTransferManager * const AManager,
-		ITargetApplicationChosenEventArgs * const Args);
-
 private:	// User declarations
+    void __fastcall SharingContractAppChosen(TObject * const Sender, const _di_IDataTransferManager AManager,
+        const _di_ITargetApplicationChosenEventArgs Args);
+    void __fastcall SharingContractTransferImage(TObject * const Sender, const IDataProviderRequest ARequest);
 public:		// User declarations
 	__fastcall TFormSharingComponent(TComponent* Owner);
 };

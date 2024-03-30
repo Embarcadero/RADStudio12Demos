@@ -21,6 +21,8 @@ TFormSharingComponent *FormSharingComponent;
 __fastcall TFormSharingComponent::TFormSharingComponent(TComponent* Owner)
 	: TForm(Owner)
 {
+  SharingContract->OnAppChosen = SharingContractAppChosen;
+  SharingContract->OnTransferImage = SharingContractTransferImage;
 }
 //---------------------------------------------------------------------------
 void __fastcall TFormSharingComponent::ButtonShareClick(TObject *Sender)
@@ -49,8 +51,8 @@ void __fastcall TFormSharingComponent::ButtonShareClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TFormSharingComponent::SharingContractAppChosen(TObject * const Sender, IDataTransferManager * const AManager,
-		  ITargetApplicationChosenEventArgs * const Args)
+void __fastcall TFormSharingComponent::SharingContractAppChosen(TObject * const Sender, const _di_IDataTransferManager AManager,
+    const _di_ITargetApplicationChosenEventArgs Args)
 {
   // With this event we can know which application is going to receive our data.
   Memo1->Lines->Add("Application Chosen: " + TWindowsString::HStringToString(Args->ApplicationName));
@@ -58,8 +60,7 @@ void __fastcall TFormSharingComponent::SharingContractAppChosen(TObject * const 
 //---------------------------------------------------------------------------
 
 void __fastcall TFormSharingComponent::SharingContractTransferImage(TObject * const Sender,
-	IDataProviderRequest * const ARequest)
-
+    const IDataProviderRequest ARequest)
 {
   // We must provide the stream with the data, the source of the stream can be any we can imagine. Hence the event
   // to retrieve it.

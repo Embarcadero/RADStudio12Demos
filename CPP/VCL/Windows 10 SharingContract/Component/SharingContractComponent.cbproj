@@ -58,8 +58,6 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <ILINK_LibraryPath>C:\dev\ExternalDemos\CPP\VCL\Windows 10 SharingContract\Component\;$(ILINK_LibraryPath)</ILINK_LibraryPath>
-        <IncludePath>C:\dev\ExternalDemos\CPP\VCL\Windows 10 SharingContract\Component\;$(IncludePath)</IncludePath>
         <AllPackageLibs>rtl.lib;vcl.lib</AllPackageLibs>
         <Multithreaded>true</Multithreaded>
         <ProjectType>CppVCLApplication</ProjectType>
