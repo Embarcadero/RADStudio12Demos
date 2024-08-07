@@ -131,7 +131,6 @@ end;
 
 procedure TSampleAttributesDelphiResource1.Post(const AContext: TEndpointContext; const ARequest: TEndpointRequest; const AResponse: TEndpointResponse);
 var
-  LBytes, LBytesResponse: TBytes;
   LReader: TJsonTextReader;
   LPropertyName: string;
   LJSONObjectBuilder: TJSONObjectBuilder;
@@ -199,7 +198,6 @@ procedure TSampleAttributesDelphiResource1.PutItem(const AContext: TEndpointCont
 var
   LItem: string;
 var
-  LBytes, LBytesResponse: TBytes;
   LReader: TJsonTextReader;
   LPropertyName: string;
   LJSONObjectBuilder: TJSONObjectBuilder;
