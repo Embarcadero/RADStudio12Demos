@@ -154,9 +154,9 @@ end;
 
 destructor TJsonStringWriter.Destroy;
 begin
+  inherited Destroy;
   FStringWriter.Free;
   FStrinBuilder.Free;
-  inherited Destroy;
 end;
 
 function TJsonStringWriter.ToString: string;
@@ -174,8 +174,8 @@ end;
 
 destructor TJsonStringReader.Destroy;
 begin
-  FStrinReader.Free;
   inherited Destroy;
+  FStrinReader.Free;
 end;
 
 { TJsonWriterGenerator }
