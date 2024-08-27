@@ -26,7 +26,7 @@ type
     FInitialTimeout: string;
     {IOTAAIPluginSetting}
     function GetModified: Boolean;
-    function GetEnabled: Boolean;
+    function GetPluginEnabled: Boolean;
   public
     class function GetRegKey: string;
     {IOTAAIPluginSetting}
@@ -34,7 +34,7 @@ type
     procedure SaveSettings;
     function ParameterValidations(var AErrorMsg: string): Boolean;
     property Modified: Boolean read GetModified;
-    property Enabled: Boolean read GetEnabled;
+    property PluginEnabled: Boolean read GetPluginEnabled;
   end;
 
 implementation
@@ -43,7 +43,7 @@ implementation
 
 { TFrame_Setting }
 
-function TFrame_Setting.GetEnabled: Boolean;
+function TFrame_Setting.GetPluginEnabled: Boolean;
 begin
   Result := Chk_Enabled.Checked;
 end;
