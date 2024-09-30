@@ -1,0 +1,69 @@
+diff --git a/Common/Core/vtkCompiler.h b/Common/Core/vtkCompiler.h
+index 238551c757..47ceeec413 100644
+--- a/Common/Core/vtkCompiler.h
++++ b/Common/Core/vtkCompiler.h
+@@ -35,7 +35,11 @@
+ #endif
+ 
+ /** extern template declarations for C++11. */
++//#define VTK_USE_EXTERN_TEMPLATE
++
++#if !defined(__MINGW32__)
+ #define VTK_USE_EXTERN_TEMPLATE
++#endif
+ 
+ //----------------------------------------------------------------------------
+ // Provide a VTK_ALWAYS_EXPORT macro.
+diff --git a/ThirdParty/glew/vtkglew/CMakeLists.txt b/ThirdParty/glew/vtkglew/CMakeLists.txt
+index d6f06b7e90..18b5deb1cc 100644
+--- a/ThirdParty/glew/vtkglew/CMakeLists.txt
++++ b/ThirdParty/glew/vtkglew/CMakeLists.txt
+@@ -40,7 +40,7 @@ if (BUILD_SHARED_LIBS)
+       # https://github.com/nigels-com/glew/issues/157
+       target_link_libraries(glew
+         PRIVATE
+-          -nostdlib)
++          -nostdlib -lmsvcrt)
+       # https://discourse.vtk.org/t/1898
+       target_compile_options(glew
+         PRIVATE
+diff --git a/ThirdParty/glew/vtkglew/include/GL/glew.h b/ThirdParty/glew/vtkglew/include/GL/glew.h
+index 7d46c075d5..5e49cc04cd 100644
+--- a/ThirdParty/glew/vtkglew/include/GL/glew.h
++++ b/ThirdParty/glew/vtkglew/include/GL/glew.h
+@@ -308,7 +308,7 @@ typedef void GLvoid;
+ #if defined(_MSC_VER) && _MSC_VER < 1400
+ typedef __int64 GLint64EXT;
+ typedef unsigned __int64 GLuint64EXT;
+-#elif defined(_MSC_VER) || defined(__BORLANDC__)
++#elif defined(_MSC_VER) || (defined(__BORLANDC__) && (!defined(__clang__) || (__clang_major__ < 15)))
+ typedef signed long long GLint64EXT;
+ typedef unsigned long long GLuint64EXT;
+ #else
+diff --git a/ThirdParty/hdf5/vtkhdf5/src/H5private.h b/ThirdParty/hdf5/vtkhdf5/src/H5private.h
+index a8e73628b3..24411089b5 100644
+--- a/ThirdParty/hdf5/vtkhdf5/src/H5private.h
++++ b/ThirdParty/hdf5/vtkhdf5/src/H5private.h
+@@ -1566,6 +1566,9 @@ H5_DLL H5_ATTR_CONST int Nflock(int fd, int operation);
+ 
+ #ifndef HDvasprintf
+ #ifdef H5_HAVE_VASPRINTF
++#ifdef __MINGW32__
++int vasprintf(char **bufp, const char *fmt, va_list _ap);
++#endif
+ #define HDvasprintf(RET, FMT, A) vasprintf(RET, FMT, A)
+ #else
+ H5_DLL int HDvasprintf(char **bufp, const char *fmt, va_list _ap);
+diff --git a/ThirdParty/tiff/vtktiff/libtiff/tiff.h b/ThirdParty/tiff/vtktiff/libtiff/tiff.h
+index 81de08ef4a..9de1446fa7 100644
+--- a/ThirdParty/tiff/vtktiff/libtiff/tiff.h
++++ b/ThirdParty/tiff/vtktiff/libtiff/tiff.h
+@@ -28,7 +28,7 @@
+ #include "vtk_tiff_mangle.h"
+ #include "tiffconf.h"
+ 
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(__MINGW32__)
+ #if TIFF_SHARED_LIBS
+ #ifdef tiff_EXPORTS
+ #define vtktiff_EXPORT __declspec(dllexport)
