@@ -253,7 +253,7 @@ object Form2: TForm2
       Touch.InteractiveGestures = [LongTap, DoubleTap]
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 3
-      Text = 'ubuntu-23.04-live-server-ppc64el.iso'
+      Text = 'ubuntu-22.04.5-live-server-ppc64el.iso'
       Position.X = 72.000000000000000000
       Position.Y = 8.000000000000000000
       Size.Width = 561.000000000000000000
@@ -265,8 +265,8 @@ object Form2: TForm2
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 2
       Text = 
-        'https://nl.archive.ubuntu.com/ubuntu-cdimages/23.04/release/ubun' +
-        'tu-23.04-live-server-ppc64el.iso'
+        'https://nl.archive.ubuntu.com/ubuntu-cdimages/22.04/release/ubun' +
+        'tu-22.04.5-live-server-ppc64el.iso'
       Position.X = 72.000000000000000000
       Position.Y = 44.000000000000000000
       Size.Width = 561.000000000000000000
