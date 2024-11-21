@@ -67,6 +67,8 @@ type
     ListView1: TListView;
     ImageList1: TImageList;
     AniIndicator2: TAniIndicator;
+    PanelLock: TPanel;
+    LabelLock: TLabel;
     procedure ButtonDiscoverClick(Sender: TObject);
     procedure ButtonPairClick(Sender: TObject);
     procedure ButtonUnPairClick(Sender: TObject);
@@ -82,6 +84,12 @@ type
     function GetServiceName(GUID: string): string;
     procedure ComboBoxPairedChange(Sender: TObject);
     procedure ButtonServicesClick(Sender: TObject);
+{$IFDEF ANDROID}
+  private const
+    LOCATION_PERMISSION = 'android.permission.ACCESS_FINE_LOCATION';
+    BLUETOOTH_SCAN_PERMISSION = 'android.permission.BLUETOOTH_SCAN';
+    BLUETOOTH_CONNECT_PERMISSION = 'android.permission.BLUETOOTH_CONNECT';
+{$ENDIF}
   private
     { Private declarations }
     FBluetoothManager: TBluetoothManager;
@@ -91,6 +99,7 @@ type
     FSocket: TBluetoothSocket;
     ItemIndex: Integer;
     ServerConnectionTH: TServerConnectionTH;
+    procedure InitBluetoothScan;
     procedure DevicesDiscoveryEnd(const Sender: TObject; const ADevices: TBluetoothDeviceList);
     procedure PairedDevices;
     procedure SendData;
@@ -99,7 +108,7 @@ type
     { Public declarations }
   end;
 
-Const
+const
   ServiceName = 'Basic Text Server';
   ServiceGUI = '{B62C4E8D-62CC-404B-BBBF-BF3E3BBB1378}';
 var
@@ -108,6 +117,9 @@ var
 implementation
 
 {$R *.fmx}
+
+uses
+  System.Permissions;
 
 procedure TForm1.ButtonPairClick(Sender: TObject);
 begin
@@ -216,6 +228,27 @@ begin
   end;
 end;
 
+procedure TForm1.InitBluetoothScan;
+begin
+  try
+    PanelLock.Visible := False;
+    LabelServer.Text := ServiceName;
+    LabelClient.Text := 'Client of '+ServiceName;
+    FBluetoothManager := TBluetoothManager.Current;
+    FAdapter := FBluetoothManager.CurrentAdapter;
+    if ManagerConnected then
+    begin
+      PairedDevices;
+      ComboboxPaired.ItemIndex := 0;
+    end;
+  except
+    on E : Exception do
+    begin
+      ShowMessage(E.Message);
+    end;
+  end;
+end;
+
 procedure TForm1.ButtonConnectToRFCOMMClick(Sender: TObject);
 begin
   if ManagerConnected then
@@ -292,8 +325,8 @@ begin
   if ManagerConnected then
   begin
     FAdapter := FBluetoothManager.CurrentAdapter;
-    FBluetoothManager.StartDiscovery(10000);
     FBluetoothManager.OnDiscoveryEnd := DevicesDiscoveryEnd;
+    FBluetoothManager.StartDiscovery(10000);
   end;
 end;
 
@@ -362,24 +395,30 @@ begin
 end;
 
 procedure TForm1.FormShow(Sender: TObject);
+{$IFDEF ANDROID}
+var
+  Permissions: TArray<string>;
 begin
-  try
-    LabelServer.Text := ServiceName;
-    LabelClient.Text := 'Client of '+ServiceName;
-    FBluetoothManager := TBluetoothManager.Current;
-    FAdapter := FBluetoothManager.CurrentAdapter;
-    if ManagerConnected then
+  if TOSVersion.Check(12) then
+    Permissions := [LOCATION_PERMISSION, BLUETOOTH_SCAN_PERMISSION, BLUETOOTH_CONNECT_PERMISSION]
+  else
+    Permissions := [LOCATION_PERMISSION];
+
+  PermissionsService.RequestPermissions(Permissions,
+    procedure(const Permissions: TClassicStringDynArray; const GrantResults: TClassicPermissionStatusDynArray)
     begin
-      PairedDevices;
-      ComboboxPaired.ItemIndex := 0;
-    end;
-  except
-    on E : Exception do
-    begin
-      ShowMessage(E.Message);
-    end;
-  end;
+      for var GrantResult in GrantResults do
+        if GrantResult <> TPermissionStatus.Granted then
+          Exit;
+
+      InitBluetoothScan;
+    end);
 end;
+{$ELSE}
+begin
+  InitBluetoothScan;
+end;
+{$ENDIF}
 
 procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
 begin

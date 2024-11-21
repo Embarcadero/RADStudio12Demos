@@ -145,7 +145,7 @@ void TNotesResource1::PutItem(TEndpointContext* AContext, TEndpointRequest* AReq
 
 String GetModuleDirectory(void)
 {
-	return ExtractFilePath(StringReplace(GetModuleName((unsigned int)HInstance), "\\\\?\\",
+	return ExtractFilePath(StringReplace(GetModuleName(reinterpret_cast<NativeUInt>(HInstance)), "\\\\?\\",
 		"", TReplaceFlags() << System::Sysutils::rfReplaceAll));
 }
 
