@@ -54,7 +54,7 @@
         <VerInfo_Locale>1046</VerInfo_Locale>
         <LinkPackageImports>rtl.bpi;vcl.bpi</LinkPackageImports>
         <Multithreaded>true</Multithreaded>
-        <PackageImports>vcl.bpi;rtl.bpi;bcbie.bpi;vclx.bpi;vclactnband.bpi;xmlrtl.bpi;bcbsmp.bpi;dbrtl.bpi;vcldb.bpi;vcldbx.bpi;bdertl.bpi;dsnap.bpi;dsnapcon.bpi;adortl.bpi;IndyCore.bpi;IndySystem.bpi;IndyProtocols.bpi;VclSmp.bpi;vclie.bpi;inet.bpi;websnap.bpi;webdsnap.bpi;inetdb.bpi;inetdbbde.bpi;inetdbxpress.bpi;soaprtl.bpi;vclribbon.bpi;dbexpress.bpi;DbxCommonDriver.bpi;DataSnapIndy10ServerTransport.bpi;DataSnapProviderClient.bpi;DataSnapServer.bpi;DbxClientDriver.bpi;DBXInterBaseDriver.bpi;DBXMySQLDriver.bpi;dbxcds.bpi;DBXSybaseASEDriver.bpi;DBXSybaseASADriver.bpi;DBXOracleDriver.bpi;DBXMSSQLDriver.bpi;DBXInformixDriver.bpi;DBXDb2Driver.bpi;$(PackageImports)</PackageImports>
+        <PackageImports>vcl.bpi;rtl.bpi;bcbie.bpi;vclx.bpi;vclactnband.bpi;xmlrtl.bpi;bcbsmp.bpi;dbrtl.bpi;vcldb.bpi;vcldbx.bpi;bdertl.bpi;dsnap.bpi;dsnapcon.bpi;adortl.bpi;IndyCore.bpi;IndySystem.bpi;IndyProtocols.bpi;VclSmp.bpi;vclie.bpi;inet.bpi;websnap.bpi;webdsnap.bpi;inetdb.bpi;inetdbbde.bpi;inetdbxpress.bpi;soaprtl.bpi;dbexpress.bpi;DbxCommonDriver.bpi;DataSnapIndy10ServerTransport.bpi;DataSnapProviderClient.bpi;DataSnapServer.bpi;DbxClientDriver.bpi;DBXInterBaseDriver.bpi;DBXMySQLDriver.bpi;dbxcds.bpi;DBXSybaseASEDriver.bpi;DBXSybaseASADriver.bpi;DBXOracleDriver.bpi;DBXMSSQLDriver.bpi;DBXInformixDriver.bpi;DBXDb2Driver.bpi;$(PackageImports)</PackageImports>
         <AllPackageLibs>rtl.lib;vcl.lib</AllPackageLibs>
         <ProjectType>CppVCLApplication</ProjectType>
         <DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
