@@ -144,9 +144,9 @@ end;
 
 procedure TForm9.FormDestroy(Sender: TObject);
 begin
-  FDLocalSQLConnection.Connected := False;
-  FDLocalSQL1.Active := False;
   FDQuery1.Close;
+  FDLocalSQL1.Active := False;
+  FDLocalSQLConnection.Connected := False;
 
   FDConnection1.Close;
 end;

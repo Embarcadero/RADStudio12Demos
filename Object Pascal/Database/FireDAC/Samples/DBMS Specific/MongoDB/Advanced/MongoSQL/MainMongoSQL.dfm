@@ -1,7 +1,7 @@
 object Form9: TForm9
   Left = 0
   Top = 0
-  Caption = 'Delphi 10 Seattle MongoDB LocalSQL Example'
+  Caption = 'MongoDB LocalSQL Example'
   ClientHeight = 501
   ClientWidth = 526
   Color = clBtnFace

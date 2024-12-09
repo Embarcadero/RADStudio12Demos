@@ -224,7 +224,8 @@ CREATE TABLE "FDQA_NumbersPrec" (
 CREATE TABLE "FDQA_Identity_tab" (
   "auto"  SERIAL NOT NULL,
   descr VARCHAR(50) 
-) WITH (OIDS=TRUE);
+);
+-- WITH (OIDS=TRUE);
 
 CREATE TABLE "FDQA_FK_tab" (
  id int NOT NULL PRIMARY KEY,

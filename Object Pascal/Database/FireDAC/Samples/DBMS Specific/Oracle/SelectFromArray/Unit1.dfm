@@ -66,7 +66,7 @@ object Form1: TForm1
   end
   object FDStoredProc1: TFDStoredProc
     Connection = FDConnection1
-    PackageName = 'ADDEMO.FDQA_COLLECTIONS'
+    PackageName = 'ADQA_COLLECTIONS'
     StoredProcName = 'ARRAY2CURSOR'
     Left = 272
     Top = 168
