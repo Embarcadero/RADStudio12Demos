@@ -107,7 +107,7 @@
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <PackageImports>vcldbx;inetdbbde;vclib;DBXOdbcDriver;DBXSybaseASEDriver;vclimg;vclactnband;vcldb;vcldsnap;bindcompvcl;vclie;DBXDb2Driver;vcltouch;websnap;vclribbon;VclSmp;vcl;DataSnapConnectors;DBXMSSQLDriver;dsnapcon;vclx;webdsnap;bdertl;bcbie;adortl;$(PackageImports)</PackageImports>
+        <PackageImports>vcldbx;inetdbbde;vclib;DBXOdbcDriver;DBXSybaseASEDriver;vclimg;vclactnband;vcldb;vcldsnap;bindcompvcl;vclie;DBXDb2Driver;vcltouch;websnap;VclSmp;vcl;DataSnapConnectors;DBXMSSQLDriver;dsnapcon;vclx;webdsnap;bdertl;bcbie;adortl;$(PackageImports)</PackageImports>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>

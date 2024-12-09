@@ -97,7 +97,7 @@
         <TLIB_PageSize>128</TLIB_PageSize>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
-        <PackageImports>vcldbx;inetdbbde;vclib;DBXOdbcDriver;DBXSybaseASEDriver;vclimg;vcldb;vcldsnap;bindcompvcl;vclie;DBXDb2Driver;vcltouch;websnap;vclribbon;VclSmp;DataSnapConnectors;DBXMSSQLDriver;dsnapcon;webdsnap;bdertl;bcbie;adortl;$(PackageImports)</PackageImports>
+        <PackageImports>vcldbx;inetdbbde;vclib;DBXOdbcDriver;DBXSybaseASEDriver;vclimg;vcldb;vcldsnap;bindcompvcl;vclie;DBXDb2Driver;vcltouch;websnap;VclSmp;DataSnapConnectors;DBXMSSQLDriver;dsnapcon;webdsnap;bdertl;bcbie;adortl;$(PackageImports)</PackageImports>
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
