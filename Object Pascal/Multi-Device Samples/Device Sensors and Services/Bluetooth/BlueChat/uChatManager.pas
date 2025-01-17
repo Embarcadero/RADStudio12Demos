@@ -14,7 +14,7 @@ unit uChatManager;
 interface
 
 uses
-  System.Classes, System.Bluetooth;
+  System.Classes, System.Bluetooth, System.SyncObjs, System.Generics.Collections;
 
 type
   TTextEvent = procedure (const Sender: TObject; const AText: string; const aDeviceName: string) of object;
@@ -23,38 +23,41 @@ type
   private
     FOnTextReceived: TTextEvent;
     FName: string;
-    FManager: TBluetoothManager;
-    FServerGUID: TGUID;
-    procedure SetOnTextReceived(const Value: TTextEvent);
+    FServerSocket: TBluetoothServerSocket;
+  protected
+    procedure Execute; override;
+    procedure TerminatedSet; override;
   public
     constructor Create(const Manager: TBluetoothManager; const Name: string; const AGUID: TGUID); overload;
     destructor Destroy; override;
-    procedure Execute; override;
-    property OnTextReceived: TTextEvent read FOnTextReceived write SetOnTextReceived;
+
+    property OnTextReceived: TTextEvent read FOnTextReceived write FOnTextReceived;
   end;
 
   TWriteThread = class(TThread)
   private
     FOnTextSent: TTextEvent;
     FName: string;
-    FLock: TObject;
-    FStringsToWrite: TStringList;
+    FMessagesBuffer: TList<string>;
     FDevice: TBluetoothDevice;
     FGUID: TGUID;
-    procedure SetOnTextSent(const Value: TTextEvent);
+    FDataInBuffer: TEvent;
+    function GetMessagesFromBuffer(out AMessages: TArray<string>): Boolean;
+  protected
+    procedure Execute; override;
+    procedure TerminatedSet; override;
   public
     constructor Create(const Device: TBluetoothDevice; const Name: string; const AGUID: TGUID); overload;
     destructor Destroy; override;
+
     procedure SendText(const AText: string);
-    procedure Execute; override;
-    property OnTextSent: TTextEvent read FOnTextSent write SetOnTextSent;
+
+    property OnTextSent: TTextEvent read FOnTextSent write FOnTextSent;
   end;
 
   TChatManager = class
   private
     FManager: TBluetoothManager;
-    FDiscoveredDevices: TBluetoothDeviceList;
-    FPairedDevices: TBluetoothDeviceList;
     FReadThread: TReadThread;
     FWriteThread: TWriteThread;
     FOnTextSent: TTextEvent;
@@ -64,35 +67,37 @@ type
     FCurrentDevice: TBluetoothDevice;
     FServerGUID: TGUID;
     FClientGUID: TGUID;
+    FKnownDevices: TBluetoothDeviceList;
     procedure DiscoveryEnd(const Sender: TObject; const ADeviceList: TBluetoothDeviceList);
     procedure SetOnTextReceived(const Value: TTextEvent);
     procedure SetOnTextSent(const Value: TTextEvent);
     procedure SetSelectedDevice(const Value: Integer);
     procedure SetCurrentDevice(const Value: TBluetoothDevice);
-    function GetKnownDevices: TBluetoothDeviceList;
     procedure TeminateThreads;
     procedure InitializeThreads;
     procedure RecreateThreads;
   public
     constructor Create;
     destructor Destroy; override;
+
     procedure SendText(const AText: string);
     procedure PairTo(const ADevice: string);
     procedure DiscoverDevices;
     function HasBluetoothDevice: boolean;
+    procedure UpdateKnownDevices;
+
     property SelectedDevice: Integer read FSelectedDevice write SetSelectedDevice;
     property CurrentDevice: TBluetoothDevice read FCurrentDevice write SetCurrentDevice;
     property OnTextReceived: TTextEvent read FOnTextReceived write SetOnTextReceived;
     property OnTextSent: TTextEvent read FOnTextSent write SetOnTextSent;
     property OnDiscoveryEnd: TDiscoveryEndEvent read FOnDiscoveryEnd write FOnDiscoveryEnd;
-    property KnownDevices: TBluetoothDeviceList read GetKnownDevices;
+    property KnownDevices: TBluetoothDeviceList read FKnownDevices;
   end;
 
 implementation
 
 uses
-  System.SysUtils, FMX.Dialogs;
-
+  System.SysUtils, System.Math, System.Hash, System.Types;
 
 { TWriteThread }
 
@@ -101,143 +106,145 @@ begin
   FDevice := Device;
   FGUID := AGUID;
   FName := Name;
-  FLock := TObject.Create;
-  FStringsToWrite := TStringList.Create;
-  Create;
+  FMessagesBuffer := TList<string>.Create;
+  FDataInBuffer := TEvent.Create;
+  inherited Create(False);
 end;
 
 destructor TWriteThread.Destroy;
 begin
-  FStringsToWrite.Free;
-  FLock.Free;
-  FDevice := nil;
   inherited;
+  FDevice := nil;
+  FreeAndNil(FMessagesBuffer);
+  FreeAndNil(FDataInBuffer);
+end;
+
+procedure TWriteThread.TerminatedSet;
+begin
+  inherited;
+  if FDataInBuffer <> nil then
+    FDataInBuffer.SetEvent;
 end;
 
 procedure TWriteThread.Execute;
+const
+  RetryTimeout = 1000;
 var
-  I: Integer;
-  LFailed: Boolean;
   LBytesToSend: TBytes;
   LClientSocket: TBluetoothSocket;
+  LMessages: TArray<string>;
 begin
-  inherited;
-  While not Terminated do
-  begin
-    if FStringsToWrite.Count > 0 then
-    begin
+  while (FDataInBuffer.WaitFor(INFINITE) = TWaitResult.wrSignaled) and not Terminated do
+    try
       FDevice.GetServices;
       LClientSocket := FDevice.CreateClientSocket(FGUID, False);
       try
         LClientSocket.Connect;
-//        if LClientSocket.Connected then
-        begin
-          TMonitor.Enter(FLock);
-          LFailed := False;
-          try
-            for I := 0 to FStringsToWrite.Count - 1 do
-            begin
+        try
+          while GetMessagesFromBuffer(LMessages) do
+          begin
+            for var LMessage in LMessages do
               try
-                LBytesToSend := TEncoding.UTF8.GetBytes(FStringsToWrite[I]);
+                if Terminated then
+                  Exit;
+
+                LBytesToSend := TEncoding.UTF8.GetBytes(LMessage);
                 LClientSocket.SendData(LBytesToSend);
                 if Assigned(FOnTextSent) then
-                  FOnTextSent(Self, FStringsToWrite[I], FName);
+                  FOnTextSent(Self, LMessage, FName);
               except
-                LFailed := True;
+                if Assigned(FOnTextSent) then
+                  FOnTextSent(Self, LMessage + ' "failed to send"', FName);
                 Break;
               end;
             end;
-            if not LFailed then
-              FStringsToWrite.Clear
-            else if Assigned(FOnTextSent) then
-              FOnTextSent(Self, FStringsToWrite[I] + ' "failed to send"', FName);
-          finally
-            TMonitor.Exit(FLock);
-          end;
+        finally
+          LClientSocket.Close;
         end;
       finally
-        LClientSocket.Close;
         FreeAndNil(LClientSocket);
       end;
+    except on E: Exception do
+      if not Terminated then
+        TThread.Sleep(RetryTimeout);
     end;
-    Sleep(500);
+end;
+
+function TWriteThread.GetMessagesFromBuffer(out AMessages: TArray<string>): Boolean;
+begin
+  TMonitor.Enter(FMessagesBuffer);
+  try
+    Result := FMessagesBuffer.Count > 0;
+    if Result then
+    begin
+      AMessages := FMessagesBuffer.ToArray;
+      FMessagesBuffer.Clear;
+      FDataInBuffer.ResetEvent;
+    end;
+  finally
+    TMonitor.Exit(FMessagesBuffer);
   end;
 end;
 
 procedure TWriteThread.SendText(const AText: string);
 begin
-  TMonitor.Enter(FLock);
+  TMonitor.Enter(FMessagesBuffer);
   try
-    FStringsToWrite.Add(AText);
+    FMessagesBuffer.Add(AText);
+    FDataInBuffer.SetEvent;
   finally
-    TMonitor.Exit(FLock);
+    TMonitor.Exit(FMessagesBuffer);
   end;
-end;
-
-procedure TWriteThread.SetOnTextSent(const Value: TTextEvent);
-begin
-  FOnTextSent := Value;
 end;
 
 { TReadThread }
 
 constructor TReadThread.Create(const Manager: TBluetoothManager; const Name: string; const AGUID: TGUID);
 begin
-  FServerGUID := AGUID;
-  FManager := Manager;
   FName := Name;
-  Create;
+  FServerSocket := Manager.CurrentAdapter.CreateServerSocket('ChatReadSocket ' + Manager.CurrentAdapter.AdapterName, AGUID, False);
+  inherited Create(False);
 end;
 
 destructor TReadThread.Destroy;
 begin
-  FManager := nil;
   inherited;
+  FreeAndNil(FServerSocket);
+end;
+
+procedure TReadThread.TerminatedSet;
+begin
+  inherited;
+  if FServerSocket <> nil then
+    FServerSocket.Close;
 end;
 
 procedure TReadThread.Execute;
 const
-  TIMEOUT = 100;
+  RetryTimeout = 1000;
 var
   LBuffer: TBytes;
   LReadSocket: TBluetoothSocket;
-  LServerSocket: TBluetoothServerSocket;
 begin
-  inherited;
-  Setlength(LBuffer,0);
-  LServerSocket := FManager.CurrentAdapter.CreateServerSocket('ChatReadSocket ' + FManager.CurrentAdapter.AdapterName, FServerGUID, False);
-  LReadSocket := nil;
   while not Terminated do
-  begin
     try
-      while not Terminated and (LReadSocket = nil) do
-      begin
-        LReadSocket := LServerSocket.Accept(TIMEOUT);
-        sleep(TIMEOUT);
-      end;
-      if (LReadSocket <> nil) and (LReadSocket.Connected) then
-      begin
-        While not Terminated and LReadSocket.Connected do // and LReadSocket.Connected  do
+      LReadSocket := FServerSocket.Accept(INFINITE);
+      if LReadSocket = nil then
+        Continue;
+      try
+        while not Terminated and LReadSocket.Connected do
         begin
-          LBuffer := LReadSocket.ReadData;
-          if (Length(LBuffer) > 0) and Assigned(FOnTextReceived) then
-          begin
-            FOnTextReceived(Self, TEncoding.UTF8.GetString(Lbuffer), FName);
-            Setlength(LBuffer,0);
-          end;
-          Sleep(TIMEOUT);
+          LBuffer := LReadSocket.ReceiveData;
+          if (LBuffer <> nil) and Assigned(FOnTextReceived) then
+            FOnTextReceived(Self, TEncoding.UTF8.GetString(LBuffer), FName);
         end;
+      finally
+        FreeAndNil(LReadSocket);
       end;
-      FreeAndNil(LReadSocket);
-    except
-      FreeAndNil(LReadSocket);
+    except on E: Exception do
+      if not Terminated then
+        TThread.Sleep(RetryTimeout);
     end;
-  end;
-end;
-
-procedure TReadThread.SetOnTextReceived(const Value: TTextEvent);
-begin
-  FOnTextReceived := Value;
 end;
 
 { TChatManager }
@@ -267,14 +274,6 @@ begin
     FOnDiscoveryEnd(Sender, ADeviceList);
 end;
 
-function TChatManager.GetKnownDevices: TBluetoothDeviceList;
-begin
-  if  FManager.CurrentAdapter <> nil then
-    Result := FManager.CurrentAdapter.PairedDevices
-  else
-    Result := nil;
-end;
-
 function TChatManager.HasBluetoothDevice: boolean;
 begin
   Result := FManager.CurrentAdapter <> nil;
@@ -302,34 +301,16 @@ procedure TChatManager.InitializeThreads;
 
   function CreateGUIDFromName(const AName: string): TGUID;
   var
-    LStringGUID: string;
-    LGUIDLength: Integer;
-    I: Integer;
+    LHash: TBytes;
   begin
-    LGUIDLength := TGUID.Empty.ToString.Length - 2;
-    if AName.Length > LGUIDLength then
-      LStringGUID := AName.Substring(0, LGUIDLength)
-    else
-      LStringGUID := AName + string.Create('F', LGUIDLength - AName.Length);
-
-    LStringGUID := UpperCase(LStringGUID);
-    for I := Low(LStringGUID) to High(LStringGUID) do
-    begin
-      if not (LStringGUID[I] in ['0'..'9', 'A'..'F']) then
-      begin
-        if LStringGUID[I] < 'A' then
-          LStringGUID := LStringGUID.Replace(LStringGUID[I], 'A')
-        else
-          LStringGUID := LStringGUID.Replace(LStringGUID[I], 'F')
-      end;
-    end;
-    LStringGUID[low(string) + 8] := '-';
-    LStringGUID[low(string) + 13] := '-';
-    LStringGUID[low(string) + 18] := '-';
-    LStringGUID[low(string) + 23] := '-';
-    Result := TGUID.Create('{' + LStringGUID + '}');
+    LHash := THashMD5.GetHashBytes(AName);
+    Result := TGUID.Create(LHash);
   end;
+
 begin
+  if FCurrentDevice = nil then
+    Exit;
+
   FServerGUID := CreateGUIDFromName(FManager.CurrentAdapter.AdapterName);
   FClientGUID := CreateGUIDFromName(FCurrentDevice.DeviceName);
 
@@ -345,6 +326,7 @@ var
   I: Integer;
   LDevice: TBluetoothDevice;
 begin
+  LDevice := nil;
   for I := 0 to FManager.LastDiscoveredDevices.Count - 1 do
     if FManager.LastDiscoveredDevices[I].DeviceName = ADevice then
     begin
@@ -358,22 +340,21 @@ end;
 
 procedure TChatManager.TeminateThreads;
 begin
-  if FReadThread <> nil then
-  begin
-    FReadThread.Terminate;
-    FReadThread.Free;
-  end;
-  if FWriteThread <> nil then
-  begin
-    FWriteThread.Terminate;
-    FWriteThread.Free;
-  end;
+  FreeAndNil(FReadThread);
+  FreeAndNil(FWriteThread);
+end;
+
+procedure TChatManager.UpdateKnownDevices;
+begin
+  if FManager.CurrentAdapter = nil then
+    FKnownDevices := nil
+  else
+    FKnownDevices := FManager.CurrentAdapter.PairedDevices;
 end;
 
 procedure TChatManager.SetCurrentDevice(const Value: TBluetoothDevice);
 begin
   FCurrentDevice := Value;
-  FCurrentDevice.GetServices;
   RecreateThreads;
 end;
 
@@ -393,12 +374,11 @@ end;
 
 procedure TChatManager.SetSelectedDevice(const Value: Integer);
 begin
-  if (Value >= 0) and (FManager.CurrentAdapter.PairedDevices.Count > Value) then
-  begin
-    FSelectedDevice := Value;
-    if Value >= 0 then
-      CurrentDevice := TBluetoothDevice(FManager.CurrentAdapter.PairedDevices.Items[Value]);
-  end;
+  FSelectedDevice := Value;
+  if (FKnownDevices <> nil) and InRange(Value, 0, FKnownDevices.Count - 1) then
+    CurrentDevice := FKnownDevices[Value]
+  else
+    CurrentDevice := nil;
 end;
 
 end.

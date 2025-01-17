@@ -1,0 +1,131 @@
+#unuse IBX.IBQuery
+#unuse IBX.IBTable
+#unuse IBX.IBStoredProc
+#unuse IBX.IBUpdateSQL
+#unuse IBX.IBCustomDataSet
+#unuse IBX.IBDatabase
+#unuse IBX.IB
+
+// Generic types -------------------------------------------------------------------------------
+#migrate TIBTransactionAction -> TFDTxAction, FireDAC.Stan.Option
+#migrate TARollback -> xdRollback
+#migrate TACommit -> xdCommit
+#migrate TARollbackRetaining -> xdRollback
+#migrate TACommitRetaining -> xdCommit
+
+#migrate TIBSQLTypes -> TFDCommandKind, FireDAC.Stan.Intf
+#migrate SQLUnknown -> skUnknown
+#migrate SQLSelect -> skSelect
+#migrate SQLInsert -> skInsert
+#migrate SQLUpdate -> skUpdate
+#migrate SQLDelete -> skDelete
+#migrate SQLDDL -> skCreate
+#migrate SQLGetSegment -> skUnknown
+#migrate SQLPutSegment -> skUnknown
+#migrate SQLExecProcedure -> skStoredProc
+#migrate SQLStartTransaction -> skStartTransaction
+#migrate SQLCommit -> skCommit
+#migrate SQLRollback -> skRollback
+#migrate SQLSelectForUpdate -> skSelectForLock
+#migrate SQLSetGenerator -> skSet
+
+#migrate TCachedUpdateStatus -> TUpdateStatus
+#migrate cusUnmodified -> usUnmodified
+#migrate cusModified -> usModified
+#migrate cusInserted -> usInserted
+#migrate cusDeleted -> usDeleted
+
+#migrate TIBGeneratorApplyEvent -> TFDFetchGeneratorsPoint, FireDAC.Stan.Option
+#migrate gamOnNewRecord -> gpImmediate
+#migrate gamOnPost -> gpDeferred
+#migrate gamOnServer -> gpNone
+
+#migrate TIBUpdateAction -> TFDErrorAction, FireDAC.Stan.Intf
+#migrate uaFail -> eaFail
+#migrate uaAbort -> eaExitFailure
+#migrate uaSkip -> eaSkip
+#migrate uaRetry -> eaRetry
+#migrate uaApply -> eaDefault
+#migrate uaApplied -> eaApplied
+
+;============================================
+; TIBDatabase
+#remove TraceFlags
+
+#migrate TIBDatabase:DatabaseName -> Params.Database
+#migrate TIBDatabase:DefaultTransaction -> Transaction
+\bServerType( *[:]*= *)'IBServer' -> DriverName\1'IB'
+\bServerType( *[:]*= *)'IBEmbedded' -> DriverName\1'IB'
+\bAllowStreamedConnected( *[:]*= *)True -> ConnectedStoredUsage\1[auDesignTime, auRunTime]
+\bAllowStreamedConnected( *[:]*= *)False -> ConnectedStoredUsage\1[]
+#migrate TIBDatabase:SQLDialect -> Params.SQLDialect
+#migrate TIBDatabase:ForceClose -> Close
+#migrate TIBDatabase:TestConnected -> Ping
+#migrate TIBDatabase:ExecuteImmediate -> ExecSQL
+#migrate TIBDatabase:CancelStatement -> AbortJob
+#migrate TIBDatabase:SQLObjectCount -> CommandCount
+#migrate TIBDatabase:SQLObjects -> Commands
+
+;============================================
+; TIBTransaction
+#remove IdleTimer
+#remove AutoStopAction
+
+#migrate TIBTransaction:SQLObjectCount -> DatasetCount
+#migrate TIBTransaction:SQLObjects -> Datasets
+#migrate TIBTransaction:InTransaction -> Active
+#migrate TIBTransaction:AllowAutoStart -> Options.AutoStart
+#migrate TIBTransaction:DefaultDatabase -> Connection
+#migrate TIBTransaction:DefaultAction -> Options.DisconnectAction
+
+;============================================
+; TIBDataSet
+#remove GeneratorField.IncrementBy
+#remove PrecommittedReads
+
+; all
+#migrate TIBCustomDataSet, TIBDataSet, TIBQuery, TIBTable, TIBStoredProc:Database -> Connection
+#migrate TIBCustomDataSet, TIBDataSet, TIBQuery, TIBTable, TIBStoredProc:StatementType -> Command.CommandKind
+#migrate TIBCustomDataSet, TIBDataSet, TIBQuery, TIBTable, TIBStoredProc:SQLType -> Command.CommandKind
+#migrate TIBCustomDataSet, TIBDataSet, TIBQuery, TIBTable, TIBStoredProc:BufferChunks -> FetchOptions.RowsetSize
+#migrate TIBCustomDataSet, TIBDataSet, TIBQuery, TIBTable, TIBStoredProc:UniDirectional -> FetchOptions.Unidirectional
+#migrate TIBCustomDataSet, TIBDataSet, TIBQuery, TIBTable, TIBStoredProc:UpdateMode -> UpdateOptions.UpdateMode
+#migrate TIBCustomDataSet, TIBDataSet, TIBQuery, TIBTable, TIBStoredProc:CachedUpdateStatus -> UpdateStatus
+#migrate TIBCustomDataSet, TIBDataSet, TIBQuery, TIBTable, TIBStoredProc:Current -> GetRow
+#migrate TIBCustomDataSet, TIBDataSet, TIBQuery, TIBTable, TIBStoredProc:DataSource -> MasterSource
+;ForcedRefresh
+
+; TIBDataSet, TIBQuery
+#migrate TIBCustomDataSet, TIBDataSet, TIBQuery:ParamCheck -> ResourceOptions.ParamCreate
+#migrate TIBCustomDataSet, TIBDataSet, TIBQuery:GeneratorField.Field -> UpdateOptions.AutoIncFields
+#migrate TIBCustomDataSet, TIBDataSet, TIBQuery:GeneratorField.Generator -> UpdateOptions.GeneratorName
+#migrate TIBCustomDataSet, TIBDataSet, TIBQuery:GeneratorField.ApplyEvent -> UpdateOptions.FetchGeneratorsPoint
+#migrate TIBCustomDataSet, TIBDataSet, TIBQuery:GeneratorField -> UpdateOptions
+
+; TIBDataSet
+#migrate TIBCustomDataSet, TIBDataSet:SelectSQL -> SQL
+
+; TIBUpdateSQL
+#migrate TIBUpdateSQL:RefreshSQL -> FetchRowSQL
+
+; TIBTable
+#remove DefaultIndex
+
+#migrate TIBDatabase -> TFDIBDatabase, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.Phys.IB, FireDAC.VCLUI.Wait, FireDAC.Comp.Client, FireDAC.IBX.Migrate
+#migrate TIBTransaction -> TFDTransaction, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.Comp.Client, FireDAC.IBX.Migrate
+#migrate TIBCustomDataSet -> TFDRdbmsDataSet, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client, FireDAC.IBX.Migrate
+#migrate TIBDataSet -> TFDIBDataSet, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client, FireDAC.IBX.Migrate
+#migrate TIBQuery -> TFDQuery, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client, FireDAC.IBX.Migrate
+#migrate TIBTable -> TFDTable, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client, FireDAC.IBX.Migrate
+#migrate TIBStoredProc -> TFDStoredProc, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client, FireDAC.IBX.Migrate
+#migrate TIBUpdateSQL -> TFDUpdateSQL, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client, FireDAC.IBX.Migrate
+
+#migrate EIBError -> EIBNativeException, FireDAC.Phys.IBWrapper, FireDAC.Stan.Error
+#migrate EIBInterBaseError -> EIBNativeException, FireDAC.Phys.IBWrapper, FireDAC.Stan.Error
+#migrate EIBInterBaseRoleError -> EIBNativeException, FireDAC.Phys.IBWrapper, FireDAC.Stan.Error
+#migrate EIBClientError -> EIBNativeException, FireDAC.Phys.IBWrapper, FireDAC.Stan.Error
+#migrate EIBPlanError -> EIBNativeException, FireDAC.Phys.IBWrapper, FireDAC.Stan.Error
+
+#migrate TIBStringField -> TWideStringField
+#migrate TIBBCDField -> TBCDField
+#migrate TIBDSBlobStream -> TFDBlobStream, FireDAC.Comp.DataSet

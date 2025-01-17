@@ -44,11 +44,21 @@ type
     procedure CBAdapterChange(Sender: TObject);
     procedure CommandManagerNewManager(const Sender: TObject; const AManagerInfo: TTetheringManagerInfo);
     procedure FormShow(Sender: TObject);
+{$IFDEF ANDROID}
+  private const
+    LOCATION_PERMISSION = 'android.permission.ACCESS_FINE_LOCATION';
+    BLUETOOTH_SCAN_PERMISSION = 'android.permission.BLUETOOTH_SCAN';
+    BLUETOOTH_CONNECT_PERMISSION = 'android.permission.BLUETOOTH_CONNECT';
+{$ENDIF}
+  private type
+    TBluetoothAvailability = (Unknown, Allowed, Prohibited);
   private
-    { Private declarations }
+    FBluetoothAvailability: TBluetoothAvailability;
     FInvariantFormatSettings: TFormatSettings;
     function CheckMediaPlayers: Boolean;
     procedure RefreshList;
+    function CheckBluetoothAvailability: Boolean;
+    function StartCommandManager: Boolean;
   public
     { Public declarations }
   end;
@@ -58,8 +68,10 @@ var
 
 implementation
 
-{$R *.fmx}
+uses
+  System.Permissions;
 
+{$R *.fmx}
 
 procedure TForm3.Button1Click(Sender: TObject);
 begin
@@ -71,8 +83,8 @@ procedure TForm3.BFindPlayersClick(Sender: TObject);
 var
   I: Integer;
 begin
-  if CommandManager.Enabled = False then
-    CommandManager.Enabled := True;
+  if not StartCommandManager then
+    Exit;
 
   if CommandApp.Manager = nil then
     CommandApp.Manager := CommandManager;
@@ -97,7 +109,6 @@ procedure TForm3.CBAdapterChange(Sender: TObject);
 begin
   CommandManager.Enabled := False;
   CommandManager.AllowedAdapters := CBAdapter.Items[CBAdapter.ItemIndex];
-  CommandManager.Enabled := True;
   CbEditTarget.Items.Clear;
   CbEditTarget.Items.Add('');
   CbEditTarget.ItemIndex := -1; // Select none
@@ -110,7 +121,8 @@ begin
   else
   begin
     CbEditTarget.Items.Add('5c:f3:70:61:15:c4');
-  end
+  end;
+  StartCommandManager;
 end;
 
 function TForm3.CheckMediaPlayers: Boolean;
@@ -161,6 +173,60 @@ begin
     lbPlayers.Items.Add('No Players Found');
 end;
 
+function TForm3.CheckBluetoothAvailability: Boolean;
+{$IFDEF ANDROID}
+const
+  BluetoothDeniedMessage = 
+    '''
+    To use Bluetooth features in app you have to obtain permissions.
+
+    To manage permissions manually, go to "Security && Privacy" -> "Privacy" -> "Permission manager"
+    ''';
+
+var
+  Permissions: TArray<string>;
+begin
+  if FBluetoothAvailability = TBluetoothAvailability.Unknown then
+  begin
+    if TOSVersion.Check(12) then
+      Permissions := [LOCATION_PERMISSION, BLUETOOTH_SCAN_PERMISSION, BLUETOOTH_CONNECT_PERMISSION]
+    else
+      Permissions := [LOCATION_PERMISSION];
+
+    PermissionsService.RequestPermissions(Permissions,
+      procedure(const Permissions: TClassicStringDynArray; const GrantResults: TClassicPermissionStatusDynArray)
+      begin
+        for var GrantResult in GrantResults do
+          if GrantResult <> TPermissionStatus.Granted then
+          begin
+            FBluetoothAvailability := TBluetoothAvailability.Prohibited;
+            ShowMessage(BluetoothDeniedMessage);
+            Exit;
+          end;
+
+        FBluetoothAvailability := TBluetoothAvailability.Allowed;
+      end);
+  end;
+  Result := FBluetoothAvailability = TBluetoothAvailability.Allowed;
+end;
+{$ELSE}
+begin
+  Result := True;
+end;
+{$ENDIF}
+
+function TForm3.StartCommandManager: Boolean;
+const
+  BluetoothItemIndex = 0;
+begin
+  if CBAdapter.ItemIndex = BluetoothItemIndex then
+    Result := CheckBluetoothAvailability
+  else
+    Result := True;
+
+  CommandManager.Enabled := Result;
+end;
+
 procedure TForm3.CommandManagerEndManagersDiscovery(const Sender: TObject; const RemoteManagers: TTetheringManagerInfoList);
 var
   I: Integer;
@@ -207,7 +273,7 @@ end;
 
 procedure TForm3.FormShow(Sender: TObject);
 begin
-  CommandManager.Enabled := True;
+  StartCommandManager;
 end;
 
 procedure TForm3.lbPlayersItemClick(const Sender: TCustomListBox; const Item: TListBoxItem);

@@ -8,9 +8,9 @@ object TEchoClassicForm: TTEchoClassicForm
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
+  OnShow = FormShow
   DesignerMasterStyle = 0
   object CBDevices: TComboBox
-    DisableFocusEffect = False
     Position.X = 120.000000000000000000
     Position.Y = 8.000000000000000000
     Size.Width = 209.000000000000000000
@@ -26,6 +26,7 @@ object TEchoClassicForm: TTEchoClassicForm
     Size.PlatformDefault = False
     TabOrder = 2
     Text = 'Known Devices'
+    TextSettings.Trimming = None
     OnClick = KnownDevicesClick
   end
   object Listen: TButton
@@ -36,6 +37,7 @@ object TEchoClassicForm: TTEchoClassicForm
     Size.PlatformDefault = False
     TabOrder = 1
     Text = 'Listen'
+    TextSettings.Trimming = None
     OnClick = ListenClick
   end
   object Seconds: TEdit
@@ -66,6 +68,7 @@ object TEchoClassicForm: TTEchoClassicForm
     Size.PlatformDefault = False
     TabOrder = 4
     Text = 'Send'
+    TextSettings.Trimming = None
     OnClick = SendClick
   end
   object Secure: TCheckBox
@@ -89,5 +92,28 @@ object TEchoClassicForm: TTEchoClassicForm
     TabOrder = 19
     Viewport.Width = 333.000000000000000000
     Viewport.Height = 366.000000000000000000
+  end
+  object PanelLock: TPanel
+    Align = Contents
+    Padding.Left = 16.000000000000000000
+    Padding.Top = 16.000000000000000000
+    Padding.Right = 16.000000000000000000
+    Padding.Bottom = 16.000000000000000000
+    Size.Width = 386.000000000000000000
+    Size.Height = 579.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 16
+    object LabelLock: TLabel
+      Align = Client
+      Size.Width = 354.000000000000000000
+      Size.Height = 547.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.HorzAlign = Center
+      Text = 
+        'To use Bluetooth features in app you have to obtain permissions.' +
+        #13#10#13#10'To manage permissions manually, go to "Security && Privacy" ' +
+        '-> "Privacy" -> "Permission manager"'
+      TabOrder = 1
+    end
   end
 end

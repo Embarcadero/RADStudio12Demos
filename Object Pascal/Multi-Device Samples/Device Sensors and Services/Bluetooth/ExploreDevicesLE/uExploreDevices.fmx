@@ -38,7 +38,7 @@ object FrDeviceExplorer: TFrDeviceExplorer
         Size.Width = 544.000000000000000000
         Size.Height = 23.000000000000000000
         Size.PlatformDefault = False
-        TextSettings.Font.Style = [fsBold]
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
         TextSettings.HorzAlign = Center
         Text = 'Services'
       end
@@ -52,6 +52,7 @@ object FrDeviceExplorer: TFrDeviceExplorer
         Size.PlatformDefault = False
         TabOrder = 0
         Text = 'Get services'
+        TextSettings.Trimming = None
         XRadius = 7.000000000000000000
         YRadius = 7.000000000000000000
         OnClick = CornerButton3Click
@@ -85,6 +86,7 @@ object FrDeviceExplorer: TFrDeviceExplorer
         Text = 
           'Get all Values (Performs a read operation for each characteristi' +
           'c found)'
+        TextSettings.Trimming = None
         OnClick = btnGetValuesClick
       end
     end
@@ -101,7 +103,7 @@ object FrDeviceExplorer: TFrDeviceExplorer
         Size.Width = 537.000000000000000000
         Size.Height = 23.000000000000000000
         Size.PlatformDefault = False
-        TextSettings.Font.Style = [fsBold]
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
         TextSettings.HorzAlign = Center
         Text = 'Devices'
       end
@@ -124,6 +126,7 @@ object FrDeviceExplorer: TFrDeviceExplorer
           Size.PlatformDefault = False
           TabOrder = 2
           Text = 'Find devices'
+          TextSettings.Trimming = None
           OnClick = Button1Click
         end
         object Button2: TButton
@@ -134,6 +137,7 @@ object FrDeviceExplorer: TFrDeviceExplorer
           Size.PlatformDefault = False
           TabOrder = 0
           Text = 'Select'
+          TextSettings.Trimming = None
           OnClick = Button2Click
         end
         object CbDevices: TComboBox
@@ -232,6 +236,7 @@ object FrDeviceExplorer: TFrDeviceExplorer
             Size.PlatformDefault = False
             StyleLookup = 'refreshtoolbutton'
             Text = 'btnRefresh'
+            TextSettings.Trimming = None
             OnClick = btnRefreshClick
           end
           object btnSuscribe: TButton
@@ -242,6 +247,7 @@ object FrDeviceExplorer: TFrDeviceExplorer
             Size.PlatformDefault = False
             TabOrder = 3
             Text = 'Suscribe'
+            TextSettings.Trimming = None
             OnClick = btnSuscribeClick
           end
           object btnWrite: TButton
@@ -252,6 +258,7 @@ object FrDeviceExplorer: TFrDeviceExplorer
             Size.PlatformDefault = False
             TabOrder = 4
             Text = 'Write'
+            TextSettings.Trimming = None
             OnClick = btnWriteClick
           end
           object EdCharacWrite: TEdit
@@ -355,7 +362,7 @@ object FrDeviceExplorer: TFrDeviceExplorer
             Size.Width = 356.000000000000000000
             Size.Height = 17.000000000000000000
             Size.PlatformDefault = False
-            TextSettings.Font.Style = [fsBold]
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
             Text = 'Available operations'
           end
           object CbRead: TCheckBox

@@ -17,7 +17,7 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Layouts,
   FMX.Memo, FMX.StdCtrls, FMX.Controls.Presentation, FMX.Edit, FMX.ListBox,
-  System.Bluetooth, FMX.ScrollBox;
+  System.Bluetooth, FMX.ScrollBox, FMX.Memo.Types;
 
 type
   TTEchoClassicForm = class(TForm)
@@ -29,10 +29,19 @@ type
     Send: TButton;
     Secure: TCheckBox;
     Memo1: TMemo;
+    PanelLock: TPanel;
+    LabelLock: TLabel;
     procedure KnownDevicesClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ListenClick(Sender: TObject);
     procedure SendClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+{$IFDEF ANDROID}
+  private const
+    LOCATION_PERMISSION = 'android.permission.ACCESS_FINE_LOCATION';
+    BLUETOOTH_SCAN_PERMISSION = 'android.permission.BLUETOOTH_SCAN';
+    BLUETOOTH_CONNECT_PERMISSION = 'android.permission.BLUETOOTH_CONNECT';
+{$ENDIF}
   private
     { Private declarations }
     procedure DiscoveryEnd(const Sender: TObject; const ADeviceList: TBluetoothDeviceList);
@@ -50,6 +59,9 @@ var
   TestServiceClass_UUID:  TGUID;
 
 implementation
+
+uses
+  System.Permissions;
 
 {$R *.fmx}
 
@@ -97,6 +109,32 @@ begin
   Manager.OnDiscoveryEnd := DiscoveryEnd;
   TestServiceClass_UUID := StringToGUID('{B62C4E8D-62CC-404b-BBBF-BF3E3BBB1374}');
 end;
+
+procedure TTEchoClassicForm.FormShow(Sender: TObject);
+{$IFDEF ANDROID}
+var
+  Permissions: TArray<string>;
+begin
+  if TOSVersion.Check(12) then
+    Permissions := [LOCATION_PERMISSION, BLUETOOTH_SCAN_PERMISSION, BLUETOOTH_CONNECT_PERMISSION]
+  else
+    Permissions := [LOCATION_PERMISSION];
+
+  PermissionsService.RequestPermissions(Permissions,
+    procedure(const Permissions: TClassicStringDynArray; const GrantResults: TClassicPermissionStatusDynArray)
+    begin
+      for var GrantResult in GrantResults do
+        if GrantResult <> TPermissionStatus.Granted then
+          Exit;
+
+      PanelLock.Visible := False;
+    end);
+end;
+{$ELSE}
+begin
+  PanelLock.Visible := False;
+end;
+{$ENDIF}
 
 procedure TTEchoClassicForm.KnownDevicesClick(Sender: TObject);
 var

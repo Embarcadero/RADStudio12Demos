@@ -17,7 +17,7 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.ListBox, FMX.StdCtrls, FMX.Edit,
   FMX.Layouts, FMX.Memo, System.Bluetooth, uChatManager, FMX.Controls.Presentation, uPairDevices,
-  FMX.ScrollBox;
+  FMX.ScrollBox, FMX.Memo.Types, FMX.Objects;
 
 type
   TFrmMainChatForm = class(TForm)
@@ -30,29 +30,39 @@ type
     PnSend: TPanel;
     BtnFindNew: TButton;
     PnMain: TPanel;
-    BackgroundImage: TImageControl;
+    BackgroundImage: TImage;
+    PanelLock: TPanel;
+    LabelLock: TLabel;
+    StyleBook1: TStyleBook;
     procedure FormShow(Sender: TObject);
     procedure BtnUpdateClick(Sender: TObject);
     procedure BtSendClick(Sender: TObject);
     procedure CbDevicesChange(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
     procedure EdNewTextKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
     procedure BtnFindNewClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormVirtualKeyboardShown(Sender: TObject; KeyboardVisible: Boolean; const Bounds: TRect);
     procedure FormVirtualKeyboardHidden(Sender: TObject; KeyboardVisible: Boolean; const Bounds: TRect);
+{$IFDEF ANDROID}
+  private const
+    LOCATION_PERMISSION = 'android.permission.ACCESS_FINE_LOCATION';
+    BLUETOOTH_SCAN_PERMISSION = 'android.permission.BLUETOOTH_SCAN';
+    BLUETOOTH_CONNECT_PERMISSION = 'android.permission.BLUETOOTH_CONNECT';
+{$ENDIF}
   private
     FChatManager: TChatManager;
     FLastName: string;
-    procedure UpdateKnownDevices;
+    procedure InitBluetoothWork;
     procedure OnNewText(const Sender: TObject; const AText: string; const aDeviceName: string);
-  public
-    { Public declarations }
   end;
 
 var
   FrmMainChatForm: TFrmMainChatForm;
 
 implementation
+
+uses
+  System.Permissions;
 
 {$R *.fmx}
 
@@ -67,8 +77,6 @@ end;
 
 procedure TFrmMainChatForm.BtnFindNewClick(Sender: TObject);
 begin
-  FrmPairdevices:= TFrmPairdevices.Create(nil);
-  FrmPairdevices.ChatManager := FChatManager;
   FrmPairdevices.Show;
 end;
 
@@ -83,22 +91,31 @@ begin
     BtSendClick(BtSend);
 end;
 
-procedure TFrmMainChatForm.FormCreate(Sender: TObject);
-begin
-  FChatManager := TChatManager.Create;
-  if not FChatManager.HasBluetoothDevice then
-  begin
-    ShowMessage('You don''t have a bluetooth adapter');
-    Application.Terminate;
-  end;
-  FChatManager.OnTextReceived := OnNewText;
-  FChatManager.OnTextSent := OnNewText;
-end;
-
 procedure TFrmMainChatForm.FormShow(Sender: TObject);
+{$IFDEF ANDROID}
+var
+  Permissions: TArray<string>;
 begin
-  UpdateKnownDevices;
+  if TOSVersion.Check(12) then
+    Permissions := [LOCATION_PERMISSION, BLUETOOTH_SCAN_PERMISSION, BLUETOOTH_CONNECT_PERMISSION]
+  else
+    Permissions := [LOCATION_PERMISSION];
+
+  PermissionsService.RequestPermissions(Permissions,
+    procedure(const Permissions: TClassicStringDynArray; const GrantResults: TClassicPermissionStatusDynArray)
+    begin
+      for var GrantResult in GrantResults do
+        if GrantResult <> TPermissionStatus.Granted then
+          Exit;
+
+      InitBluetoothWork;
+    end);
 end;
+{$ELSE}
+begin
+  InitBluetoothWork;
+end;
+{$ENDIF}
 
 procedure TFrmMainChatForm.FormVirtualKeyboardHidden(Sender: TObject; KeyboardVisible: Boolean; const Bounds: TRect);
 begin
@@ -108,8 +125,27 @@ end;
 procedure TFrmMainChatForm.FormVirtualKeyboardShown(Sender: TObject; KeyboardVisible: Boolean; const Bounds: TRect);
 begin
   PnMain.align := TAlignLayout.Top;
-  PnMain.Height := ClientHeight - Bounds.height {$IFDEF ANDROID} + 20 {$ENDIF};
+  PnMain.Height := ClientHeight - Bounds.Height;
   MmReceived.GoToTextEnd;
+end;
+
+procedure TFrmMainChatForm.InitBluetoothWork;
+begin
+  PanelLock.Visible := False;
+
+  FChatManager := TChatManager.Create;
+  if not FChatManager.HasBluetoothDevice then
+  begin
+    ShowMessage('You don''t have a bluetooth adapter');
+    Application.Terminate;
+  end;
+  FChatManager.OnTextReceived := OnNewText;
+  FChatManager.OnTextSent := OnNewText;
+
+  FrmPairdevices.ChatManager := FChatManager;
+  FrmPairdevices.OnHide := BtnUpdateClick;
+
+  BtnUpdateClick(nil);
 end;
 
 procedure TFrmMainChatForm.OnNewText(const Sender: TObject; const AText, aDeviceName: string);
@@ -127,18 +163,19 @@ begin
 end;
 
 procedure TFrmMainChatForm.BtnUpdateClick(Sender: TObject);
-begin
-  UpdateKnownDevices;
-end;
-
-procedure TFrmMainChatForm.UpdateKnownDevices;
 var
   I: Integer;
 begin
+  FChatManager.UpdateKnownDevices;
   CbDevices.Clear;
   if FChatManager.KnownDevices <> nil then
     for I := 0 to FChatManager.KnownDevices.Count - 1 do
-      CbDevices.Items.Add(FChatManager.KnownDevices.Items[I].DeviceName);
+      CbDevices.Items.Add(FChatManager.KnownDevices[I].DeviceName);
+end;
+
+procedure TFrmMainChatForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  FreeAndNil(FChatManager);
 end;
 
 end.

@@ -85,7 +85,7 @@ type
     procedure CleanDeviceInformation;
     procedure DevicesDiscoveryLEEnd(const Sender: TObject; const ADevices: TBluetoothLEDeviceList);
     procedure ServicesDiscovered(const Sender: TObject; const AServiceList: TBluetoothGattServiceList);
-    procedure GetCurrentDevice(var ADevice: TBluetoothLEDevice);
+    procedure GetCurrentDevice(out ADevice: TBluetoothLEDevice);
     procedure DidCharacteristicRead(const Sender: TObject; const ACharacteristic: TBluetoothGattCharacteristic;
       AGattStatus: TBluetoothGattStatus);
     procedure RefreshCurrentCharacteristic;
@@ -114,8 +114,12 @@ end;
 procedure TFrDeviceExplorer.DidCharacteristicRead(const Sender: TObject; const ACharacteristic: TBluetoothGattCharacteristic;
   AGattStatus: TBluetoothGattStatus);
 begin
-  if GUIDToString(ACharacteristic.UUID) = EdCharacUID.Text then
-    RefreshCurrentCharacteristic;
+  TThread.Synchronize(TThread.Current,
+    procedure
+    begin
+      if GUIDToString(ACharacteristic.UUID) = EdCharacUID.Text then
+        RefreshCurrentCharacteristic;
+    end);
 end;
 
 procedure TFrDeviceExplorer.FormCreate(Sender: TObject);
@@ -148,70 +152,74 @@ begin
 end;
 
 procedure TFrDeviceExplorer.ServicesDiscovered(const Sender: TObject; const AServiceList: TBluetoothGattServiceList);
-var
-  I: Integer;
-  CharList: TBluetoothGattCharacteristicList;
-  AChar: TBluetoothGattCharacteristic;
-  J: Integer;
-  CurrentRow: Integer;
-  Options: string;
-  ServiceItem, Characteristic, CharProps: TTreeViewItem;
 begin
-  TvCharacteristics.Clear;
-  for I := 0 to AServiceList.Count - 1 do
-  begin
-    ServiceItem := TTreeViewItem.Create(nil);
-    ServiceItem.Parent := TvCharacteristics;
-    ServiceItem.Tag := I;
-    ServiceItem.IsExpanded := True;
-    if AServiceList[I].UUIDName.IsEmpty then
-      ServiceItem.Text := 'Unnamed'
-    else
-      ServiceItem.Text := AServiceList[I].UUIDName;
-    CharList := AServiceList[I].Characteristics;
-    for J := 0 to CharList.Count - 1 do
+  TThread.Synchronize(TThread.Current,
+    procedure
+    var
+      I: Integer;
+      CharList: TBluetoothGattCharacteristicList;
+      AChar: TBluetoothGattCharacteristic;
+      J: Integer;
+      Options: string;
+      ServiceItem, Characteristic, CharProps: TTreeViewItem;
     begin
-      AChar := CharList[J];
-      TThread.Synchronize(nil, procedure begin
-        Options := '';
-        if TBluetoothProperty.Broadcast in AChar.Properties then Options := Options + 'Broadcast ';
-        if TBluetoothProperty.ExtendedProps in AChar.Properties then Options := Options + 'ExtendedProps ';
-        if TBluetoothProperty.Notify in AChar.Properties then Options := Options + 'Notify ';
-        if TBluetoothProperty.Indicate in AChar.Properties then Options := Options + 'Indicate ';
-        if TBluetoothProperty.Read in AChar.Properties then Options := Options + 'Read ';
-        if TBluetoothProperty.Write in AChar.Properties then Options := Options + 'Write ';
-        if TBluetoothProperty.WriteNoResponse in AChar.Properties then Options := Options + 'WriteNoResponse ';
-        if TBluetoothProperty.SignedWrite in AChar.Properties then Options := Options + 'SignedWrite ';
-        Characteristic := TTreeViewItem.Create(nil);
-        Characteristic.Parent := ServiceItem;
-        Characteristic.IsExpanded := False;
-        if AChar.UUIDName.IsEmpty then
-          Characteristic.Text := 'Unnamed'
+      TvCharacteristics.Clear;
+      for I := 0 to AServiceList.Count - 1 do
+      begin
+        ServiceItem := TTreeViewItem.Create(nil);
+        ServiceItem.Parent := TvCharacteristics;
+        ServiceItem.Tag := I;
+        ServiceItem.IsExpanded := True;
+        if AServiceList[I].UUIDName.IsEmpty then
+          ServiceItem.Text := 'Unnamed'
         else
-          Characteristic.Text := AChar.UUIDName;
-        Characteristic.Tag := J;
-        CharProps := TTreeViewItem.Create(nil);
-        CharProps.Tag := -1;
-        CharProps.Parent := Characteristic;
-        CharProps.IsExpanded := True;
-        CharProps.Text := GUIDToString(AChar.UUID);
-        CharProps := TTreeViewItem.Create(nil);
-        CharProps.Tag := -1;
-        CharProps.Parent := Characteristic;
-        CharProps.IsExpanded := True;
-        CharProps.Text := Options;
-      end);
-      Application.ProcessMessages;
-    end;
-  end;
-  tmAnimateFindServices.Enabled := False;
-  PbServices.Value := 100;
+          ServiceItem.Text := AServiceList[I].UUIDName;
+        CharList := AServiceList[I].Characteristics;
+        for J := 0 to CharList.Count - 1 do
+        begin
+          AChar := CharList[J];
+
+          Options := '';
+          if TBluetoothProperty.Broadcast in AChar.Properties then Options := Options + 'Broadcast ';
+          if TBluetoothProperty.ExtendedProps in AChar.Properties then Options := Options + 'ExtendedProps ';
+          if TBluetoothProperty.Notify in AChar.Properties then Options := Options + 'Notify ';
+          if TBluetoothProperty.Indicate in AChar.Properties then Options := Options + 'Indicate ';
+          if TBluetoothProperty.Read in AChar.Properties then Options := Options + 'Read ';
+          if TBluetoothProperty.Write in AChar.Properties then Options := Options + 'Write ';
+          if TBluetoothProperty.WriteNoResponse in AChar.Properties then Options := Options + 'WriteNoResponse ';
+          if TBluetoothProperty.SignedWrite in AChar.Properties then Options := Options + 'SignedWrite ';
+          Characteristic := TTreeViewItem.Create(nil);
+          Characteristic.Parent := ServiceItem;
+          Characteristic.IsExpanded := False;
+          if AChar.UUIDName.IsEmpty then
+            Characteristic.Text := 'Unnamed'
+          else
+            Characteristic.Text := AChar.UUIDName;
+          Characteristic.Tag := J;
+          CharProps := TTreeViewItem.Create(nil);
+          CharProps.Tag := -1;
+          CharProps.Parent := Characteristic;
+          CharProps.IsExpanded := True;
+          CharProps.Text := GUIDToString(AChar.UUID);
+          CharProps := TTreeViewItem.Create(nil);
+          CharProps.Tag := -1;
+          CharProps.Parent := Characteristic;
+          CharProps.IsExpanded := True;
+          CharProps.Text := Options;
+
+          Application.ProcessMessages;
+        end;
+      end;
+      tmAnimateFindServices.Enabled := False;
+      PbServices.Value := 100;
+    end);
 end;
 
-procedure TFrDeviceExplorer.GetCurrentDevice(var ADevice: TBluetoothLEDevice);
+procedure TFrDeviceExplorer.GetCurrentDevice(out ADevice: TBluetoothLEDevice);
 var
   I: Integer;
 begin
+  ADevice := nil;
   for I := 0 to FBluetoothManagerLE.LastDiscoveredDevices.Count - 1 do
   begin
     if FBluetoothManagerLE.LastDiscoveredDevices[I].DeviceName = EdCurrentDevice.Text then
@@ -220,14 +228,18 @@ begin
 end;
 
 procedure TFrDeviceExplorer.DevicesDiscoveryLEEnd(const Sender: TObject; const ADevices: TBluetoothLEDeviceList);
-var
-  I: Integer;
 begin
-  CbDevices.Items.Clear;
-  for I := 0 to ADevices.Count - 1 do
-    CbDevices.Items.Add(ADevices[I].DeviceName);
-  tmAnimateFindDevices.Enabled := False;
-  PbFindDevices.Value := 100;
+  TThread.Synchronize(TThread.Current,
+    procedure
+    var
+      I: Integer;
+    begin
+      CbDevices.Items.Clear;
+      for I := 0 to ADevices.Count - 1 do
+        CbDevices.Items.Add(ADevices[I].DeviceName);
+      tmAnimateFindDevices.Enabled := False;
+      PbFindDevices.Value := 100;
+    end);
 end;
 
 procedure TFrDeviceExplorer.tmAnimateFindDevicesTimer(Sender: TObject);
@@ -259,7 +271,6 @@ var
   ADevice: TBluetoothLEDevice;
   AService: TBluetoothGattService;
   AChar: TBluetoothGattCharacteristic;
-  I: Integer;
 begin
   GetCurrentDevice(ADevice);
   if ADevice <> nil then
@@ -367,7 +378,6 @@ begin
       ADevice.OnCharacteristicRead := DidCharacteristicRead;
       for I := 0 to ADevice.Services.Count -1 do
       begin
-        AChar := nil;
         AService := ADevice.Services[I];
         CharList := AService.Characteristics;
         for J := 0 to CharList.Count - 1 do
@@ -406,14 +416,11 @@ procedure TFrDeviceExplorer.btnSuscribeClick(Sender: TObject);
 var
   ADevice: TBluetoothLEDevice;
   AService: TBluetoothGattService;
-  CharList: TBluetoothGattCharacteristicList;
   AChar: TBluetoothGattCharacteristic;
-  J: Integer;
 begin
   GetCurrentDevice(ADevice);
   if ADevice <> nil then
   begin
-    AChar := nil;
     AService := ADevice.Services[CurrentService];
     AChar := AService.Characteristics[CurrentCharacteristic];
     if (TBluetoothProperty.Notify in AChar.Properties) or (TBluetoothProperty.Indicate in AChar.Properties)then
@@ -430,12 +437,10 @@ var
   ADevice: TBluetoothLEDevice;
   AService: TBluetoothGattService;
   AChar: TBluetoothGattCharacteristic;
-  J: Integer;
 begin
   GetCurrentDevice(ADevice);
   if ADevice <> nil then
   begin
-    AChar := nil;
     AService := ADevice.Services[CurrentService];
     AChar := AService.characteristics[CurrentCharacteristic];
     if (TBluetoothProperty.Write in AChar.Properties) or (TBluetoothProperty.WriteNoResponse in AChar.Properties)
