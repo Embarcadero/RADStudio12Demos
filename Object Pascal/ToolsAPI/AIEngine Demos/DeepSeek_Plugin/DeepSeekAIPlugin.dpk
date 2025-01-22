@@ -1,0 +1,49 @@
+package DeepSeekAIPlugin;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS ON}
+{$RANGECHECKS ON}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  vcl,
+  vclactnband,
+  vclimg,
+  designide,
+  vclwinx,
+  xmlrtl,
+  RESTComponents,
+  bindcomp;
+
+contains
+  DeepSeekPlugin.Main in 'DeepSeekPlugin.Main.pas',
+  DeepSeekPlugin.Consts in 'DeepSeekPlugin.Consts.pas',
+  DeepSeekPlugin.Controller in 'DeepSeekPlugin.Controller.pas',
+  DeepSeekPlugin.Setting in 'DeepSeekPlugin.Setting.pas' {Frame_Setting: TFrame},
+  DeepSeekPlugin.JsonHelper in 'DeepSeekPlugin.JsonHelper.pas',
+  DeepSeekPlugin.Models in 'DeepSeekPlugin.Models.pas';
+
+end.

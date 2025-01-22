@@ -23,16 +23,15 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 {
 }
 //---------------------------------------------------------------------------
-void __fastcall TForm1::ShareContractAppChosen(System::TObject* const Sender,
-	const Winapi::Applicationmodel::Datatransfer::_di_IDataTransferManager AManager,
-	const Winapi::Applicationmodel::Datatransfer::_di_ITargetApplicationChosenEventArgs Args)
+void __fastcall TForm1::ShareContractAppChosen(TObject * const Sender, const _di_IDataTransferManager AManager,
+	const _di_ITargetApplicationChosenEventArgs Args)
 {
   // With this event we can know which application is going to receive our data.
   Memo1->Lines->Add("Application Chosen: " + TWindowsString::HStringToString(Args->ApplicationName));
 }
 //---------------------------------------------------------------------------
-void __fastcall TForm1::ShareContractTranferImage(System::TObject* const Sender,
-	const Winapi::Applicationmodel::Datatransfer::_di_IDataProviderRequest ARequest)
+void __fastcall TForm1::ShareContractTranferImage(TObject * const Sender,
+	const IDataProviderRequest ARequest)
 {
   // We must provide the stream with the data, the source of the stream can be any we can imagine. Hence the event
   // to retrieve it.
@@ -68,9 +67,9 @@ void __fastcall TForm1::FormCreate(TObject *Sender)
 {
   TShareContract::OnProcessMessages = Application->ProcessMessages;
   TShareContract::BasePath = ExtractFilePath(Application->ExeName);
-  FShareWrapper = new TShareContract(this->Handle);
-  FShareWrapper->OnAppChosen = this->ShareContractAppChosen;
-  FShareWrapper->OnTransferImage = this->ShareContractTranferImage;
+  FShareWrapper = new TShareContract(Handle);
+  FShareWrapper->OnAppChosen = ShareContractAppChosen;
+  FShareWrapper->OnTransferImage = ShareContractTranferImage;
 }
 //---------------------------------------------------------------------------
 

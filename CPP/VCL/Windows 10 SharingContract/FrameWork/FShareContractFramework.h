@@ -49,13 +49,11 @@ __published:	// IDE-managed Components
 	void __fastcall FormDestroy(TObject *Sender);
 private:	// User declarations
 	TShareContract *FShareWrapper;
+	void __fastcall ShareContractAppChosen(TObject * const Sender, const _di_IDataTransferManager AManager,
+		const _di_ITargetApplicationChosenEventArgs Args);
+	void __fastcall ShareContractTranferImage(TObject * const Sender, const IDataProviderRequest ARequest);
 public:		// User declarations
 	__fastcall TForm1(TComponent* Owner);
-	void __fastcall ShareContractAppChosen(System::TObject* const Sender, const Winapi::Applicationmodel::Datatransfer::_di_IDataTransferManager AManager, const Winapi::Applicationmodel::Datatransfer::_di_ITargetApplicationChosenEventArgs Args);
-	void __fastcall ShareContractTranferImage(System::TObject* const Sender, const Winapi::Applicationmodel::Datatransfer::_di_IDataProviderRequest ARequest);
-//	void __fastcall ShareContractTranferImage(TObject * const Sender, IDataProviderRequest * const ARequest);
-//	void __fastcall ShareContractAppChosen(TObject * const Sender, IDataTransferManager * const AManager,
-//		ITargetApplicationChosenEventArgs * const Args);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm1 *Form1;
