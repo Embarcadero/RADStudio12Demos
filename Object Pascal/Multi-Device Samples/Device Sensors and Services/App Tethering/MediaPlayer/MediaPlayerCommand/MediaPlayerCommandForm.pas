@@ -50,6 +50,8 @@ type
     BLUETOOTH_SCAN_PERMISSION = 'android.permission.BLUETOOTH_SCAN';
     BLUETOOTH_CONNECT_PERMISSION = 'android.permission.BLUETOOTH_CONNECT';
 {$ENDIF}
+  private const
+    BluetoothItemIndex = 0;
   private type
     TBluetoothAvailability = (Unknown, Allowed, Prohibited);
   private
@@ -108,19 +110,16 @@ end;
 procedure TForm3.CBAdapterChange(Sender: TObject);
 begin
   CommandManager.Enabled := False;
-  CommandManager.AllowedAdapters := CBAdapter.Items[CBAdapter.ItemIndex];
   CbEditTarget.Items.Clear;
   CbEditTarget.Items.Add('');
   CbEditTarget.ItemIndex := -1; // Select none
-  if CommandManager.AllowedAdapters = 'Network' then
+  if CBAdapter.ItemIndex = BluetoothItemIndex then
+    CbEditTarget.Items.Add('5c:f3:70:61:15:c4')
+  else
   begin
     CbEditTarget.Items.Add('192.168.1.0');
     CbEditTarget.Items.Add('TargetHost1;TargetHost2');
     CbEditTarget.Items.Add('192.168.1.123');
-  end
-  else
-  begin
-    CbEditTarget.Items.Add('5c:f3:70:61:15:c4');
   end;
   StartCommandManager;
 end;
@@ -180,7 +179,7 @@ const
     '''
     To use Bluetooth features in app you have to obtain permissions.
 
-    To manage permissions manually, go to "Security && Privacy" -> "Privacy" -> "Permission manager"
+    To manage permissions manually, go to "Security & Privacy" -> "Privacy" -> "Permission manager"
     ''';
 
 var
@@ -196,15 +195,15 @@ begin
     PermissionsService.RequestPermissions(Permissions,
       procedure(const Permissions: TClassicStringDynArray; const GrantResults: TClassicPermissionStatusDynArray)
       begin
+        FBluetoothAvailability := TBluetoothAvailability.Allowed;
         for var GrantResult in GrantResults do
           if GrantResult <> TPermissionStatus.Granted then
           begin
             FBluetoothAvailability := TBluetoothAvailability.Prohibited;
             ShowMessage(BluetoothDeniedMessage);
-            Exit;
+            Break;
           end;
-
-        FBluetoothAvailability := TBluetoothAvailability.Allowed;
+        StartCommandManager;
       end);
   end;
   Result := FBluetoothAvailability = TBluetoothAvailability.Allowed;
@@ -216,13 +215,14 @@ end;
 {$ENDIF}
 
 function TForm3.StartCommandManager: Boolean;
-const
-  BluetoothItemIndex = 0;
 begin
   if CBAdapter.ItemIndex = BluetoothItemIndex then
     Result := CheckBluetoothAvailability
   else
     Result := True;
+
+  if Result then
+    CommandManager.AllowedAdapters := CBAdapter.Items[CBAdapter.ItemIndex];
 
   CommandManager.Enabled := Result;
 end;
