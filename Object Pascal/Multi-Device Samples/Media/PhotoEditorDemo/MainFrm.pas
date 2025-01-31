@@ -65,15 +65,19 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FilterComboBoxChange(Sender: TObject);
     procedure ButtonTakePhotoFromCameraClick(Sender: TObject);
+{$IF Defined(ANDROID)}
   private const
     StoragePermission = 'android.permission.WRITE_EXTERNAL_STORAGE';
+{$ENDIF}
   private
     FEffect: TFilter;
     FRawBitmap: TBitmap;
-    procedure DisplayRationale(Sender: TObject; const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc);
     procedure DoOnChangedEffectParam(Sender: TObject);
     procedure LoadFilterSettings(Rec: TFilterRec);
+{$IF Defined(ANDROID)}
     procedure TakePicturePermissionRequestResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
+    procedure DisplayRationale(Sender: TObject; const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc);
+{$ENDIF}
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -101,18 +105,6 @@ destructor TBaseMainForm.Destroy;
 begin
   FreeAndNil(FRawBitmap);
   inherited Destroy;
-end;
-
-// Optional rationale display routine to display permission requirement rationale to the user
-procedure TBaseMainForm.DisplayRationale(Sender: TObject; const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc);
-begin
-  // Show an explanation to the user *asynchronously* - don't block this thread waiting for the user's response!
-  // After the user sees the explanation, invoke the post-rationale routine to request the permissions
-  TDialogService.ShowMessage('The app needs to access the device''s storage to save the photos',
-    procedure(const AResult: TModalResult)
-    begin
-      APostRationaleProc;
-    end)
 end;
 
 procedure TBaseMainForm.ActionListUpdate(Action: TBasicAction; var Handled: Boolean);
@@ -213,10 +205,14 @@ end;
 
 procedure TBaseMainForm.ButtonTakePhotoFromCameraClick(Sender: TObject);
 begin
+{$IF Defined(ANDROID)}
   if TOSVersion.Check(11) then
     ActionTakePhotoFromCamera.Execute
   else
     PermissionsService.RequestPermissions([StoragePermission], TakePicturePermissionRequestResult, DisplayRationale);
+{$ELSE}
+  ActionTakePhotoFromCamera.Execute;
+{$ENDIF}
 end;
 
 procedure TBaseMainForm.DoOnChangedEffectParam(Sender: TObject);
@@ -298,6 +294,7 @@ begin
   end;
 end;
 
+{$IF Defined(ANDROID)}
 procedure TBaseMainForm.TakePicturePermissionRequestResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
 begin
   // 1 permission involved: WRITE_EXTERNAL_STORAGE
@@ -306,5 +303,18 @@ begin
   else
     TDialogService.ShowMessage('Cannot take photos because the required permission has not been granted');
 end;
+
+// Optional rationale display routine to display permission requirement rationale to the user
+procedure TBaseMainForm.DisplayRationale(Sender: TObject; const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc);
+begin
+  // Show an explanation to the user *asynchronously* - don't block this thread waiting for the user's response!
+  // After the user sees the explanation, invoke the post-rationale routine to request the permissions
+  TDialogService.ShowMessage('The app needs to access the device''s storage to save the photos',
+    procedure(const AResult: TModalResult)
+    begin
+      APostRationaleProc;
+    end)
+end;
+{$ENDIF}
 
 end.

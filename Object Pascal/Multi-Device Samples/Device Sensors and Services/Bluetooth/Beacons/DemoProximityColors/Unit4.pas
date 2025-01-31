@@ -27,15 +27,18 @@ type
     procedure FormShow(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+{$IF Defined(ANDROID)}
   private const
     LOCATION_PERMISSION = 'android.permission.ACCESS_FINE_LOCATION';
     BLUETOOTH_SCAN_PERMISSION = 'android.permission.BLUETOOTH_SCAN';
     BLUETOOTH_CONNECT_PERMISSION = 'android.permission.BLUETOOTH_CONNECT';
+{$ENDIF}
   private
     FBeaconManager: TBeaconManager;
     FisScanning: Boolean;
     procedure BeaconProximity(const Sender: TObject; const ABeacon: IBeacon; Proximity: TBeaconProximity);
     procedure StartScan;
+    procedure DoStartScan;
   end;
 
 var
@@ -65,27 +68,36 @@ begin
 end;
 
 procedure TForm4.StartScan;
-var
-  Permissions: TArray<string>;
 begin
+{$IF Defined(ANDROID)}
+  var Permissions: TArray<string>;
+
   if TOSVersion.Check(12) then
     Permissions := [LOCATION_PERMISSION, BLUETOOTH_SCAN_PERMISSION, BLUETOOTH_CONNECT_PERMISSION]
   else
     Permissions := [LOCATION_PERMISSION];
 
   PermissionsService.RequestPermissions(Permissions,
-    procedure(const Permissions: TClassicStringDynArray; const GrantResults: TClassicPermissionStatusDynArray)
+    procedure(const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray)
     begin
-      if ((Length(GrantResults) = 3) and (GrantResults[0] = TPermissionStatus.Granted)
-                                     and (GrantResults[1] = TPermissionStatus.Granted)
-                                     and (GrantResults[2] = TPermissionStatus.Granted)) or
-         ((Length(GrantResults) = 1) and (GrantResults[0] = TPermissionStatus.Granted)) then
+      if ((Length(AGrantResults) = 3) and (AGrantResults[0] = TPermissionStatus.Granted)
+                                     and (AGrantResults[1] = TPermissionStatus.Granted)
+                                     and (AGrantResults[2] = TPermissionStatus.Granted)) or
+         ((Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted)) then
       begin
-        FBeaconManager.StartScan();
-        Button1.Text := 'STOP';
-        FisScanning := True;
+        DoStartScan;
       end;
     end);
+{$ELSE}
+  DoStartScan;
+{$ENDIF}
+end;
+
+procedure TForm4.DoStartScan;
+begin
+  FBeaconManager.StartScan;
+  Button1.Text := 'STOP';
+  FisScanning := True;
 end;
 
 procedure TForm4.Button1Click(Sender: TObject);

@@ -48,10 +48,12 @@ type
     procedure BluetoothLE1CharacteristicRead(const Sender: TObject;
       const ACharacteristic: TBluetoothGattCharacteristic;
       AGattStatus: TBluetoothGattStatus);
+{$IF Defined(ANDROID)}
   private const
     LOCATION_PERMISSION = 'android.permission.ACCESS_FINE_LOCATION';
     BLUETOOTH_SCAN_PERMISSION = 'android.permission.BLUETOOTH_SCAN';
     BLUETOOTH_CONNECT_PERMISSION = 'android.permission.BLUETOOTH_CONNECT';
+{$ENDIF}
   private
     FCurrentDevice: TBluetoothLEDevice;
     procedure RequestPermissions(const CompletionHandler: TProc);
@@ -257,9 +259,10 @@ begin
 end;
 
 procedure TFrMainform.RequestPermissions(const CompletionHandler: TProc);
-var
-  Permissions: TArray<string>;
 begin
+{$IF Defined(ANDROID)}
+  var Permissions: TArray<string>;
+
   if TOSVersion.Check(12) then
     Permissions := [LOCATION_PERMISSION, BLUETOOTH_SCAN_PERMISSION, BLUETOOTH_CONNECT_PERMISSION]
   else
@@ -269,14 +272,17 @@ begin
     CompletionHandler
   else
     PermissionsService.RequestPermissions(Permissions,
-      procedure(const Permissions: TClassicStringDynArray; const GrantResults: TClassicPermissionStatusDynArray)
+      procedure(const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray)
       begin
-        if ((Length(GrantResults) = 3) and (GrantResults[0] = TPermissionStatus.Granted)
-                                       and (GrantResults[1] = TPermissionStatus.Granted)
-                                       and (GrantResults[2] = TPermissionStatus.Granted)) or
-           ((Length(GrantResults) = 1) and (GrantResults[0] = TPermissionStatus.Granted)) then
+        if ((Length(AGrantResults) = 3) and (AGrantResults[0] = TPermissionStatus.Granted)
+                                       and (AGrantResults[1] = TPermissionStatus.Granted)
+                                       and (AGrantResults[2] = TPermissionStatus.Granted)) or
+           ((Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted)) then
           CompletionHandler;
       end);
+{$ELSE}
+  CompletionHandler;
+{$ENDIF}
 end;
 
 end.

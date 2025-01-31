@@ -49,10 +49,12 @@ type
     procedure Button2Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormShow(Sender: TObject);
+{$IF Defined(ANDROID)}
   private const
     LOCATION_PERMISSION = 'android.permission.ACCESS_FINE_LOCATION';
     BLUETOOTH_SCAN_PERMISSION = 'android.permission.BLUETOOTH_SCAN';
     BLUETOOTH_CONNECT_PERMISSION = 'android.permission.BLUETOOTH_CONNECT';
+{$ENDIF}
   private
     { Private declarations }
     DevicesAdvDataFiltered: TBluetoothLEDeviceList;
@@ -316,8 +318,6 @@ end;
 
 
 procedure TForm6.Button1Click(Sender: TObject);
-var
-  Permissions: TArray<string>;
 begin
   if DevicesAdvDataFiltered = nil then
     DevicesAdvDataFiltered := TBluetoothLEDeviceList.Create(False);
@@ -328,20 +328,26 @@ begin
   ForceConnectDevices := CheckBox1.IsChecked;
   Listbox1.Clear;
 
+{$IF Defined(ANDROID)}
+  var Permissions: TArray<string>;
+
   if TOSVersion.Check(12) then
     Permissions := [LOCATION_PERMISSION, BLUETOOTH_SCAN_PERMISSION, BLUETOOTH_CONNECT_PERMISSION]
   else
     Permissions := [LOCATION_PERMISSION];
 
   PermissionsService.RequestPermissions(Permissions,
-    procedure(const Permissions: TClassicStringDynArray; const GrantResults: TClassicPermissionStatusDynArray)
+    procedure(const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray)
     begin
-      if ((Length(GrantResults) = 3) and (GrantResults[0] = TPermissionStatus.Granted)
-                                     and (GrantResults[1] = TPermissionStatus.Granted)
-                                     and (GrantResults[2] = TPermissionStatus.Granted)) or
-         ((Length(GrantResults) = 1) and (GrantResults[0] = TPermissionStatus.Granted)) then
+      if ((Length(AGrantResults) = 3) and (AGrantResults[0] = TPermissionStatus.Granted)
+                                     and (AGrantResults[1] = TPermissionStatus.Granted)
+                                     and (AGrantResults[2] = TPermissionStatus.Granted)) or
+         ((Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted)) then
         BluetoothLE1.DiscoverDevices(ScanningTime);
     end);
+{$ELSE}
+  BluetoothLE1.DiscoverDevices(ScanningTime);
+{$ENDIF}
 end;
 
 procedure TForm6.Button2Click(Sender: TObject);

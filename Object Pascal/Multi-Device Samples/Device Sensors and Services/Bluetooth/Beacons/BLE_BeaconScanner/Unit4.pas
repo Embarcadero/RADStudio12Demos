@@ -24,9 +24,11 @@ uses
 
 const
   DISCOVERY_TIMEOUT = 20000;
+{$IF Defined(ANDROID)}
   LOCATION_PERMISSION = 'android.permission.ACCESS_FINE_LOCATION';
   BLUETOOTH_SCAN_PERMISSION = 'android.permission.BLUETOOTH_SCAN';
   BLUETOOTH_CONNECT_PERMISSION = 'android.permission.BLUETOOTH_CONNECT';
+{$ENDIF}
   BEACON_TYPE_POSITION = 2;
   BEACON_GUID_POSITION = 4;
   BEACON_MAJOR_POSITION = 20;
@@ -86,10 +88,11 @@ begin
 end;
 
 procedure TForm4.Button1Click(Sender: TObject);
-var
-  Permissions: TArray<string>;
 begin
   FBeaconDeviceList.Clear;
+
+{$IF Defined(ANDROID)}
+  var Permissions: TArray<string>;
 
   if TOSVersion.Check(12) then
     Permissions := [LOCATION_PERMISSION, BLUETOOTH_SCAN_PERMISSION, BLUETOOTH_CONNECT_PERMISSION]
@@ -100,22 +103,25 @@ begin
     FManager.StartDiscovery(DISCOVERY_TIMEOUT)
   else
     PermissionsService.DefaultService.RequestPermissions(Permissions,
-      procedure(const Permissions: TClassicStringDynArray; const GrantResults: TClassicPermissionStatusDynArray)
+      procedure(const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray)
       begin
-        if ((Length(GrantResults) = 3) and (GrantResults[0] = TPermissionStatus.Granted)
-                                       and (GrantResults[1] = TPermissionStatus.Granted)
-                                       and (GrantResults[2] = TPermissionStatus.Granted)) or
-           ((Length(GrantResults) = 1) and (GrantResults[0] = TPermissionStatus.Granted)) then
+        if ((Length(AGrantResults) = 3) and (AGrantResults[0] = TPermissionStatus.Granted)
+                                       and (AGrantResults[1] = TPermissionStatus.Granted)
+                                       and (AGrantResults[2] = TPermissionStatus.Granted)) or
+           ((Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted)) then
           FManager.StartDiscovery(DISCOVERY_TIMEOUT);
       end,
-      procedure(const Permissions: TClassicStringDynArray; const PostRationaleProc: TProc)
+      procedure(const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc)
       begin
         TDialogService.ShowMessage('Please grant the permission(s) to discover nearby BLE devices',
           procedure(const AResult: TModalResult)
           begin
-            PostRationaleProc;
+            APostRationaleProc;
           end);
       end);
+{$ELSE}
+  FManager.StartDiscovery(DISCOVERY_TIMEOUT)
+{$ENDIF}
 end;
 
 procedure TForm4.Button2Click(Sender: TObject);

@@ -405,9 +405,9 @@ begin
     Permissions := [LOCATION_PERMISSION];
 
   PermissionsService.RequestPermissions(Permissions,
-    procedure(const Permissions: TClassicStringDynArray; const GrantResults: TClassicPermissionStatusDynArray)
+    procedure(const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray)
     begin
-      for var GrantResult in GrantResults do
+      for var GrantResult in AGrantResults do
         if GrantResult <> TPermissionStatus.Granted then
           Exit;
 

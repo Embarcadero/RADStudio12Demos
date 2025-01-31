@@ -63,10 +63,12 @@ type
       AGattStatus: TBluetoothGattStatus);
     procedure BluetoothLE1CharacteristicRead(const Sender: TObject; const ACharacteristic: TBluetoothGattCharacteristic;
       AGattStatus: TBluetoothGattStatus);
+{$IF Defined(ANDROID)}
   private const
     LOCATION_PERMISSION = 'android.permission.ACCESS_FINE_LOCATION';
     BLUETOOTH_SCAN_PERMISSION = 'android.permission.BLUETOOTH_SCAN';
     BLUETOOTH_CONNECT_PERMISSION = 'android.permission.BLUETOOTH_CONNECT';
+{$ENDIF}
   private
     { Private declarations }
     //FBluetoothLE: TBluetoothLE;
@@ -113,7 +115,7 @@ const
   ENERGY_EXPANDED_STATUS_MASK = $8;
   RR_INTERVAL_MASK = $10;
 
-
+  ScanningTime = 2500;
 
 var
   frmHeartMonitor: TfrmHeartMonitor;
@@ -365,13 +367,14 @@ begin
 end;
 
 procedure TfrmHeartMonitor.DoScan;
-var
-  Permissions: TArray<string>;
 begin
   ClearData;
   lblDevice.Text := '';
   lblBodyLocation.Text := '';
   lblContactStatus.Text := '';
+
+{$IF Defined(ANDROID)}
+  var Permissions: TArray<string>;
 
   if TOSVersion.Check(12) then
     Permissions := [LOCATION_PERMISSION, BLUETOOTH_SCAN_PERMISSION, BLUETOOTH_CONNECT_PERMISSION]
@@ -379,14 +382,17 @@ begin
     Permissions := [LOCATION_PERMISSION];
 
   PermissionsService.RequestPermissions(Permissions,
-    procedure(const Permissions: TClassicStringDynArray; const GrantResults: TClassicPermissionStatusDynArray)
+    procedure(const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray)
     begin
-      if ((Length(GrantResults) = 3) and (GrantResults[0] = TPermissionStatus.Granted)
-                                     and (GrantResults[1] = TPermissionStatus.Granted)
-                                     and (GrantResults[2] = TPermissionStatus.Granted)) or
-         ((Length(GrantResults) = 1) and (GrantResults[0] = TPermissionStatus.Granted)) then
-        BluetoothLE1.DiscoverDevices(2500, [HRSERVICE])
+      if ((Length(AGrantResults) = 3) and (AGrantResults[0] = TPermissionStatus.Granted)
+                                     and (AGrantResults[1] = TPermissionStatus.Granted)
+                                     and (AGrantResults[2] = TPermissionStatus.Granted)) or
+         ((Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted)) then
+        BluetoothLE1.DiscoverDevices(ScanningTime, [HRSERVICE])
     end);
+{$ELSE}
+  BluetoothLE1.DiscoverDevices(ScanningTime, [HRSERVICE]);
+{$ENDIF}
 end;
 
 end.

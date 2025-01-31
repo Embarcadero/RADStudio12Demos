@@ -36,9 +36,11 @@ type
     Label2: TLabel;
     procedure BtnStartAnnounceClick(Sender: TObject);
     procedure UpdateTextAndSwitch;
+{$IF Defined(ANDROID)}
   private const
     BLUETOOTH_ADVERTISE_PERMISSION = 'android.permission.BLUETOOTH_ADVERTISE';
     BLUETOOTH_CONNECT_PERMISSION = 'android.permission.BLUETOOTH_CONNECT';
+{$ENDIF}
   private
     { Private declarations }
     FBluetoothManagerLE: TBluetoothLEManager;
@@ -57,7 +59,7 @@ type
       var AGattStatus: TBluetoothGattStatus);
     procedure MyWriteEvent(const Sender: TObject; const ACharacteristic: TBluetoothGattCharacteristic;
       var AGattStatus: TBluetoothGattStatus; const AValue: TByteDynArray);
-    procedure StartAnnounce;
+    procedure StartAnnouncing;
   public
     { Public declarations }
   end;
@@ -96,20 +98,24 @@ const
 {Publish service}
 procedure TForm4.BtnStartAnnounceClick(Sender: TObject);
 begin
+{$IF Defined(ANDROID)}
   if TOSVersion.Check(12) then
   begin
     PermissionsService.RequestPermissions([BLUETOOTH_ADVERTISE_PERMISSION, BLUETOOTH_CONNECT_PERMISSION],
-      procedure(const Permissions: TClassicStringDynArray; const GrantResults: TClassicPermissionStatusDynArray)
+      procedure(const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray)
       begin
-        if (Length(GrantResults) = 2) and (GrantResults[0] = TPermissionStatus.Granted) and (GrantResults[1] = TPermissionStatus.Granted) then
-          StartAnnounce;
+        if (Length(AGrantResults) = 2) and (AGrantResults[0] = TPermissionStatus.Granted) and (AGrantResults[1] = TPermissionStatus.Granted) then
+          StartAnnouncing;
       end);
   end
   else
-    StartAnnounce;
+    StartAnnouncing;
+{$ELSE}
+  StartAnnouncing;
+{$ENDIF}
 end;
 
-procedure TForm4.StartAnnounce;
+procedure TForm4.StartAnnouncing;
 var
   CharValue: TBytes;
 begin

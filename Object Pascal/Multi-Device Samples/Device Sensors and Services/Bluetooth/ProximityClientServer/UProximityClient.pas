@@ -51,10 +51,12 @@ type
     procedure btnScanClick(Sender: TObject);
     procedure tmrReadRSSITimer(Sender: TObject);
     procedure FormShow(Sender: TObject);
+{$IF Defined(ANDROID)}
   private const
     LOCATION_PERMISSION = 'android.permission.ACCESS_FINE_LOCATION';
     BLUETOOTH_SCAN_PERMISSION = 'android.permission.BLUETOOTH_SCAN';
     BLUETOOTH_CONNECT_PERMISSION = 'android.permission.BLUETOOTH_CONNECT';
+{$ENDIF}
   private
     { Private declarations }
     FBLEManager: TBluetoothLEManager;
@@ -80,7 +82,7 @@ type
                                   AGattStatus: TBluetoothGattStatus);
     procedure OnDeviceDisconnect(Sender: TObject);
     procedure DoReadRSSI(const Sender: TObject; ARssiValue: Integer; AGattStatus: TBluetoothGattStatus);
-    procedure DoScan;
+    procedure Scan;
     procedure Connect;
     procedure GetServiceAndCharacteristics;
     procedure EnableRSSIMonitorize(Enabled: boolean);
@@ -89,6 +91,7 @@ type
     procedure CheckDistanceThreshold(PathLoss: Integer);
     procedure SetPosition(Position: TPosition);
     procedure UpdateCurrentPosition(Position: TPosition);
+    procedure DoScan;
   public
     { Public declarations }
   end;
@@ -128,7 +131,7 @@ end;
 
 procedure TfrmProximityForm.btnScanClick(Sender: TObject);
 begin
-  DoScan;
+  Scan;
 end;
 
 procedure TfrmProximityForm.CheckDistanceThreshold(PathLoss: Integer);
@@ -241,12 +244,12 @@ begin
   CheckDistanceThreshold(LRatioDB);
 end;
 
-procedure TfrmProximityForm.DoScan;
-var
-  LList: TBluetoothUUIDsList;
-  Permissions: TArray<string>;
+procedure TfrmProximityForm.Scan;
 begin
   EnableRSSIMonitorize(False);
+
+{$IF Defined(ANDROID)}
+  var Permissions: TArray<string>;
 
   if TOSVersion.Check(12) then
     Permissions := [LOCATION_PERMISSION, BLUETOOTH_SCAN_PERMISSION, BLUETOOTH_CONNECT_PERMISSION]
@@ -254,27 +257,35 @@ begin
     Permissions := [LOCATION_PERMISSION];
 
   PermissionsService.RequestPermissions(Permissions,
-    procedure(const Permissions: TClassicStringDynArray; const GrantResults: TClassicPermissionStatusDynArray)
+    procedure(const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray)
     begin
-      if ((Length(GrantResults) = 3) and (GrantResults[0] = TPermissionStatus.Granted)
-                                     and (GrantResults[1] = TPermissionStatus.Granted)
-                                     and (GrantResults[2] = TPermissionStatus.Granted)) or
-         ((Length(GrantResults) = 1) and (GrantResults[0] = TPermissionStatus.Granted)) then
+      if ((Length(AGrantResults) = 3) and (AGrantResults[0] = TPermissionStatus.Granted)
+                                     and (AGrantResults[1] = TPermissionStatus.Granted)
+                                     and (AGrantResults[2] = TPermissionStatus.Granted)) or
+         ((Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted)) then
       begin
-        lblDevice.Text := 'Scanning for devices';
-
-        LList := TBluetoothUUIDsList.Create;
-        try
-          LList.Add(LINK_LOSS_SERVICE);
-          LList.Add(IMMEDIATE_ALERT_SERVICE);
-          LList.Add(TX_POWER_SERVICE);
-
-          FBLEManager.StartDiscovery(1500, LList, False);
-        finally
-          LList.Free;
-        end;
+        DoScan;
       end;
     end);
+{$ELSE}
+  DoScan;
+{$ENDIF}
+end;
+
+procedure TfrmProximityForm.DoScan;
+begin
+  lblDevice.Text := 'Scanning for devices';
+
+  var BluetoothUUIDs := TBluetoothUUIDsList.Create;
+  try
+    BluetoothUUIDs.Add(LINK_LOSS_SERVICE);
+    BluetoothUUIDs.Add(IMMEDIATE_ALERT_SERVICE);
+    BluetoothUUIDs.Add(TX_POWER_SERVICE);
+
+    FBLEManager.StartDiscovery(1500, BluetoothUUIDs, False);
+  finally
+    BluetoothUUIDs.Free;
+  end;
 end;
 
 procedure TfrmProximityForm.EnableRSSIMonitorize(Enabled: boolean);
@@ -288,7 +299,7 @@ begin
   FBLEManager := TBluetoothLEManager.Current;
   FBLEManager.OnDiscoveryEnd := DoDiscoveryEndEvent;
   FCurrentPosition := poUnknown;
-  DoScan;
+  Scan;
 end;
 
 procedure TfrmProximityForm.GetServiceAndCharacteristics;
@@ -349,7 +360,7 @@ end;
 procedure TfrmProximityForm.OnDeviceDisconnect(Sender: TObject);
 begin
   FBLEDevice := nil;
-  DoScan; //Restore the connection
+  Scan; //Restore the connection
 end;
 
 procedure TfrmProximityForm.SetPosition(Position: TPosition);

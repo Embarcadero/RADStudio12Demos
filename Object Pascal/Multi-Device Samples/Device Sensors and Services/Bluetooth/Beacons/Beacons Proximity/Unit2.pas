@@ -84,10 +84,12 @@ type
     procedure SpinBox1Change(Sender: TObject);
     procedure ComboBox1Change(Sender: TObject);
     procedure sbMajorChange(Sender: TObject);
+{$IF Defined(ANDROID)}
   private const
     LOCATION_PERMISSION = 'android.permission.ACCESS_FINE_LOCATION';
     BLUETOOTH_SCAN_PERMISSION = 'android.permission.BLUETOOTH_SCAN';
     BLUETOOTH_CONNECT_PERMISSION = 'android.permission.BLUETOOTH_CONNECT';
+{$ENDIF}
   private
     FBeaconManager: TBeaconManager;
     FLock: TObject;
@@ -106,6 +108,7 @@ type
 
     procedure BtnAddRegionCloseEvent(Sender: TObject; const AResult: TModalResult);
     procedure AddRegion;
+    procedure StartScanning;
     { Private declarations }
   public
     { Public declarations }
@@ -229,10 +232,11 @@ begin
 end;
 
 procedure TForm2.Button1Click(Sender: TObject);
-var
-  Permissions: TArray<string>;
 begin
   CheckManager;
+
+{$IF Defined(ANDROID)}
+  var Permissions: TArray<string>;
 
   if TOSVersion.Check(12) then
     Permissions := [LOCATION_PERMISSION, BLUETOOTH_SCAN_PERMISSION, BLUETOOTH_CONNECT_PERMISSION]
@@ -240,19 +244,27 @@ begin
     Permissions := [LOCATION_PERMISSION];
 
   PermissionsService.RequestPermissions(Permissions,
-    procedure(const Permissions: TClassicStringDynArray; const GrantResults: TClassicPermissionStatusDynArray)
+    procedure(const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray)
     begin
-      if ((Length(GrantResults) = 3) and (GrantResults[0] = TPermissionStatus.Granted)
-                                     and (GrantResults[1] = TPermissionStatus.Granted)
-                                     and (GrantResults[2] = TPermissionStatus.Granted)) or
-         ((Length(GrantResults) = 1) and (GrantResults[0] = TPermissionStatus.Granted)) then
+      if ((Length(AGrantResults) = 3) and (AGrantResults[0] = TPermissionStatus.Granted)
+                                     and (AGrantResults[1] = TPermissionStatus.Granted)
+                                     and (AGrantResults[2] = TPermissionStatus.Granted)) or
+         ((Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted)) then
       begin
-        if not FBeaconManager.StartScan then
-          ShowMessage('Cannot start to scan beacons')
-        else
-          Timer1.Enabled := True;
+        StartScanning;
       end;
     end);
+{$ELSE}
+  StartScanning;
+{$ENDIF}
+end;
+
+procedure TForm2.StartScanning;
+begin
+  if not FBeaconManager.StartScan then
+    ShowMessage('Cannot start to scan beacons')
+  else
+    Timer1.Enabled := True;
 end;
 
 procedure TForm2.Button2Click(Sender: TObject);

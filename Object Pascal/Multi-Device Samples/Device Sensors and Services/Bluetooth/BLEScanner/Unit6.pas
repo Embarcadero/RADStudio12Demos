@@ -37,16 +37,20 @@ type
     procedure FormShow(Sender: TObject);
     procedure BluetoothLE1ServicesDiscovered(const Sender: TObject; const AServiceList: TBluetoothGattServiceList);
     procedure ListBox1ItemClick(const Sender: TCustomListBox; const Item: TListBoxItem);
+{$IF Defined(ANDROID)}
   private const
     LOCATION_PERMISSION = 'android.permission.ACCESS_FINE_LOCATION';
     BLUETOOTH_SCAN_PERMISSION = 'android.permission.BLUETOOTH_SCAN';
     BLUETOOTH_CONNECT_PERMISSION = 'android.permission.BLUETOOTH_CONNECT';
+{$ENDIF}
   private
     { Private declarations }
     Scanning: Boolean;
     ScanningStart: Cardinal;
+{$IF Defined(ANDROID)}
     procedure RequestPermissionsResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
     procedure DisplayRationale(Sender: TObject; const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc);
+{$ENDIF}
     procedure StartBLEDiscovery;
     procedure StopBLEDiscovery;
   public
@@ -128,15 +132,19 @@ begin
 end;
 
 procedure TForm6.btnStartScanClick(Sender: TObject);
-var
-  Permissions: TArray<string>;
 begin
+{$IF Defined(ANDROID)}
+  var Permissions: TArray<string>;
+
   if TOSVersion.Check(12) then
     Permissions := [LOCATION_PERMISSION, BLUETOOTH_SCAN_PERMISSION, BLUETOOTH_CONNECT_PERMISSION]
   else
     Permissions := [LOCATION_PERMISSION];
 
   PermissionsService.RequestPermissions(Permissions, RequestPermissionsResult, DisplayRationale);
+{$ELSE}
+  StartBLEDiscovery;
+{$ENDIF}
 end;
 
 procedure TForm6.btnStopScanClick(Sender: TObject);
@@ -168,6 +176,7 @@ begin
   Listbox1.Enabled := False;
 end;
 
+{$IF Defined(ANDROID)}
 procedure TForm6.DisplayRationale(Sender: TObject; const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc);
 begin
   TDialogService.ShowMessage('We need to be given permission to discover BLE devices',
@@ -187,6 +196,7 @@ begin
   else
     TDialogService.ShowMessage('Cannot start BLE scan because not all required permissions have been granted');
 end;
+{$ENDIF}
 
 procedure TForm6.StartBLEDiscovery;
 begin

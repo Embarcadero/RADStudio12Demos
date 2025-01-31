@@ -57,10 +57,12 @@ type
     procedure Beacon1NewBLEScanFilter(const Sender: TObject;
       AKindofScanFilter: TKindofScanFilter;
       const ABluetoothLEScanFilter: TBluetoothLEScanFilter);
+{$IF Defined(ANDROID)}
   private const
     LOCATION_PERMISSION = 'android.permission.ACCESS_FINE_LOCATION';
     BLUETOOTH_SCAN_PERMISSION = 'android.permission.BLUETOOTH_SCAN';
     BLUETOOTH_CONNECT_PERMISSION = 'android.permission.BLUETOOTH_CONNECT';
+{$ENDIF}
   private
     FBeacon : IBeacon;
     FRssiToDistance: TRssiToDistance;
@@ -68,6 +70,7 @@ type
     FTXCount: Integer;
     FTXArray: Array [0..99] of integer;
     FBluetoothLEDeviceList: TBluetoothLEDeviceList;
+    procedure StartScanning;
   public
     function GetScanningModeChecked: TBeaconScanMode;
     function GetKindOfBeaconsChecked: TKindofBeacons;
@@ -120,12 +123,13 @@ begin
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
-var
-  Permissions: TArray<string>;
 begin
 //  Listbox1.Clear;
   Beacon1.Mode := GetScanningModeChecked;
   Beacon1.ModeExtended := GetKindOfBeaconsChecked;
+
+{$IF Defined(ANDROID)}
+  var Permissions: TArray<string>;
 
   if TOSVersion.Check(12) then
     Permissions := [LOCATION_PERMISSION, BLUETOOTH_SCAN_PERMISSION, BLUETOOTH_CONNECT_PERMISSION]
@@ -133,21 +137,29 @@ begin
     Permissions := [LOCATION_PERMISSION];
 
   PermissionsService.RequestPermissions(Permissions,
-    procedure(const Permissions: TClassicStringDynArray; const GrantResults: TClassicPermissionStatusDynArray)
+    procedure(const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray)
     begin
-      if ((Length(GrantResults) = 3) and (GrantResults[0] = TPermissionStatus.Granted)
-                                     and (GrantResults[1] = TPermissionStatus.Granted)
-                                     and (GrantResults[2] = TPermissionStatus.Granted)) or
-         ((Length(GrantResults) = 1) and (GrantResults[0] = TPermissionStatus.Granted)) then
+      if ((Length(AGrantResults) = 3) and (AGrantResults[0] = TPermissionStatus.Granted)
+                                     and (AGrantResults[1] = TPermissionStatus.Granted)
+                                     and (AGrantResults[2] = TPermissionStatus.Granted)) or
+         ((Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted)) then
       begin
-        if not Beacon1.Enabled then
-          Beacon1.Enabled := True
-        else
-          Beacon1.StartScan;
-
-        Timer1.Enabled := True;
+        StartScanning;
       end;
     end);
+{$ELSE}
+  StartScanning;
+{$ENDIF}
+end;
+
+procedure TForm1.StartScanning;
+begin
+  if not Beacon1.Enabled then
+    Beacon1.Enabled := True
+  else
+    Beacon1.StartScan;
+
+  Timer1.Enabled := True;
 end;
 
 procedure TForm1.Button2Click(Sender: TObject);
