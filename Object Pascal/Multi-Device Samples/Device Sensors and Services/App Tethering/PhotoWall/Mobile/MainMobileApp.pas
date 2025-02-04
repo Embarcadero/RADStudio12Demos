@@ -43,15 +43,17 @@ type
     procedure TakePhotoManagerRemoteManagerShutdown(const Sender: TObject; const ManagerIdentifier: string);
     procedure LbWallsItemClick(const Sender: TCustomListBox; const Item: TListBoxItem);
     procedure ButtonTakePhotoFromCameraClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
+{$IF Defined(ANDROID)}
+  private const
+    StoragePermission = 'android.permission.WRITE_EXTERNAL_STORAGE';
+{$ENDIF}
   private
     { Private declarations }
     Connected: Boolean;
-    FPermissionCamera,
-    FPermissionReadExternalStorage,
-    FPermissionWriteExternalStorage: string;
-    procedure DisplayRationale(Sender: TObject; const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc);
+{$IF Defined(ANDROID)}
     procedure TakePicturePermissionRequestResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
+    procedure DisplayRationale(Sender: TObject; const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc);
+{$ENDIF}
     procedure FindWalls;
     function SendImage: Boolean;
     function CheckPhotoWalls: Boolean;
@@ -66,11 +68,6 @@ var
 implementation
 
 uses
-{$IFDEF ANDROID}
-  Androidapi.Helpers,
-  Androidapi.JNI.JavaTypes,
-  Androidapi.JNI.Os,
-{$ENDIF}
   FMX.DialogService;
 
 {$R *.fmx}
@@ -102,7 +99,14 @@ end;
 
 procedure TForm49.ButtonTakePhotoFromCameraClick(Sender: TObject);
 begin
-  PermissionsService.RequestPermissions([FPermissionCamera, FPermissionReadExternalStorage, FPermissionWriteExternalStorage], TakePicturePermissionRequestResult, DisplayRationale);
+{$IF Defined(ANDROID)}
+  if TOSVersion.Check(11) then
+    TakePhotoFromCameraAction1.Execute
+  else
+    PermissionsService.RequestPermissions([StoragePermission], TakePicturePermissionRequestResult, DisplayRationale);
+{$ELSE}
+  TakePhotoFromCameraAction1.Execute;
+{$ENDIF}
 end;
 
 function TForm49.CheckPhotoWalls: Boolean;
@@ -114,29 +118,6 @@ begin
     Result := False;
     TDialogService.ShowMessage('Please, select a PhotoWall to send the image');
   end;
-end;
-
-// Optional rationale display routine to display permission requirement rationale to the user
-procedure TForm49.DisplayRationale(Sender: TObject; const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc);
-var
-  I: Integer;
-  RationaleMsg: string;
-begin
-  for I := 0 to High(APermissions) do
-  begin
-    if APermissions[I] = FPermissionCamera then
-      RationaleMsg := RationaleMsg + 'The app needs to access the camera to take a photo' + SLineBreak + SLineBreak
-    else if APermissions[I] = FPermissionReadExternalStorage then
-      RationaleMsg := RationaleMsg + 'The app needs to read a photo file from your device';
-  end;
-
-  // Show an explanation to the user *asynchronously* - don't block this thread waiting for the user's response!
-  // After the user sees the explanation, invoke the post-rationale routine to request the permissions
-  TDialogService.ShowMessage(RationaleMsg,
-    procedure(const AResult: TModalResult)
-    begin
-      APostRationaleProc;
-    end)
 end;
 
 procedure TForm49.RefreshList;
@@ -163,15 +144,6 @@ begin
   for I := TakePhotoManager.PairedManagers.Count - 1 downto 0 do
     TakePhotoManager.UnPairManager(TakePhotoManager.PairedManagers[I]);
   TakePhotoManager.DiscoverManagers;
-end;
-
-procedure TForm49.FormCreate(Sender: TObject);
-begin
-{$IFDEF ANDROID}
-  FPermissionCamera := JStringToString(TJManifest_permission.JavaClass.CAMERA);
-  FPermissionReadExternalStorage := JStringToString(TJManifest_permission.JavaClass.READ_EXTERNAL_STORAGE);
-  FPermissionWriteExternalStorage := JStringToString(TJManifest_permission.JavaClass.WRITE_EXTERNAL_STORAGE);
-{$ENDIF}
 end;
 
 procedure TForm49.FormShow(Sender: TObject);
@@ -224,13 +196,27 @@ begin
   Password := '1234';
 end;
 
+{$IF Defined(ANDROID)}
 procedure TForm49.TakePicturePermissionRequestResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
 begin
-  // 3 permissions involved: CAMERA, READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE
-  if (Length(AGrantResults) = 3) and (AGrantResults[0] = TPermissionStatus.Granted) and (AGrantResults[1] = TPermissionStatus.Granted) and (AGrantResults[2] = TPermissionStatus.Granted) then
+  // 1 permission involved: WRITE_EXTERNAL_STORAGE
+  if (Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted) then
     TakePhotoFromCameraAction1.Execute
   else
-    TDialogService.ShowMessage('Cannot take a photo because the required permissions are not all granted');
+    TDialogService.ShowMessage('Cannot take photos because the required permission has not been granted');
 end;
+
+// Optional rationale display routine to display permission requirement rationale to the user
+procedure TForm49.DisplayRationale(Sender: TObject; const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc);
+begin
+  // Show an explanation to the user *asynchronously* - don't block this thread waiting for the user's response!
+  // After the user sees the explanation, invoke the post-rationale routine to request the permissions
+  TDialogService.ShowMessage('The app needs access to the device''s storage to save photos',
+    procedure(const AResult: TModalResult)
+    begin
+      APostRationaleProc;
+    end)
+end;
+{$ENDIF}
 
 end.
