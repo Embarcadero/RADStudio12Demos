@@ -41,11 +41,18 @@ type
     procedure MapView1MapClick(const Position: TMapCoordinate);
     procedure TrackBar1Change(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+{$IF Defined(ANDROID)}
+  private const
+    CoarseLocationPermission = 'android.permission.ACCESS_COARSE_LOCATION';
+    FineLocationPermission = 'android.permission.ACCESS_FINE_LOCATION';
+{$ENDIF}
   private
     { Private declarations }
-    FPermissionFineLocation: string;
+{$IF Defined(ANDROID)}
     procedure DisplayRationale(Sender: TObject; const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc);
     procedure LocationPermissionRequestResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
+{$ENDIF}
+    procedure SetMapViewOptions;
   public
     { Public declarations }
   end;
@@ -56,11 +63,6 @@ var
 implementation
 
 uses
-{$IFDEF ANDROID}
-  Androidapi.Helpers,
-  Androidapi.JNI.JavaTypes,
-  Androidapi.JNI.Os,
-{$ENDIF}
   FMX.DialogService;
 
 {$R *.fmx}
@@ -68,12 +70,14 @@ uses
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-{$IFDEF ANDROID}
-  FPermissionFineLocation := JStringToString(TJManifest_permission.JavaClass.ACCESS_FINE_LOCATION);
+{$IF Defined(ANDROID)}
+  PermissionsService.RequestPermissions([CoarseLocationPermission, FineLocationPermission], LocationPermissionRequestResult, DisplayRationale);
+{$ELSE}
+  SetMapViewOptions;
 {$ENDIF}
-  PermissionsService.RequestPermissions([FPermissionFineLocation], LocationPermissionRequestResult, DisplayRationale);
 end;
 
+{$IF Defined(ANDROID)}
 // Optional rationale display routine to display permission requirement rationale to the user
 procedure TForm1.DisplayRationale(Sender: TObject; const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc);
 begin
@@ -88,12 +92,16 @@ end;
 
 procedure TForm1.LocationPermissionRequestResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
 begin
-  // 2 permissions involved: ACCESS_FINE_LOCATION and ACCESS_COARSE_LOCATION
-  if (Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted) then
-  begin
-    MapView1.ControlOptions := MapView1.ControlOptions + [TMapControlOption.MyLocation];
-    MapView1.LayerOptions := MapView1.LayerOptions + [TMapLayerOption.UserLocation];
-  end;
+  // 2 permissions involved: ACCESS_COARSE_LOCATION or ACCESS_FINE_LOCATION
+  if (Length(AGrantResults) = 2) and ((AGrantResults[0] = TPermissionStatus.Granted) or (AGrantResults[1] = TPermissionStatus.Granted)) then
+    SetMapViewOptions;
+end;
+{$ENDIF}
+
+procedure TForm1.SetMapViewOptions;
+begin
+  MapView1.ControlOptions := MapView1.ControlOptions + [TMapControlOption.MyLocation];
+  MapView1.LayerOptions := MapView1.LayerOptions + [TMapLayerOption.UserLocation];
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);

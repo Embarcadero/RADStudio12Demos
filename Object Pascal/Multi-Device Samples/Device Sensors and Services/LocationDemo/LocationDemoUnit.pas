@@ -50,6 +50,11 @@ type
     procedure LocationSensor1LocationChanged(Sender: TObject; const OldLocation, NewLocation: TLocationCoord2D);
     procedure Switch1Switch(Sender: TObject);
     procedure Button2Click(Sender: TObject);
+{$IF Defined(ANDROID)}
+  private const
+    CoarseLocationPermission = 'android.permission.ACCESS_COARSE_LOCATION';
+    FineLocationPermission = 'android.permission.ACCESS_FINE_LOCATION';
+{$ENDIF}
   private
     { Private declarations }
     FGeocoder: TGeocoder;
@@ -65,40 +70,26 @@ implementation
 
 {$R *.fmx}
 
-{$IFDEF ANDROID}
 uses
-  System.Permissions, AndroidApi.Helpers, AndroidApi.Jni.Os;
-{$ENDIF}
+  System.Permissions;
 
 procedure TForm1.Switch1Switch(Sender: TObject);
 begin
-{$IFDEF ANDROID}
+{$IF Defined(ANDROID)}
   if Switch1.IsChecked then
   begin
-    var PermissionAccessCoarseLocation := JStringToString(TJManifest_permission.JavaClass.ACCESS_COARSE_LOCATION);
-    var PermissionAccessFineLocation := JStringToString(TJManifest_permission.JavaClass.ACCESS_FINE_LOCATION);
-
-    PermissionsService.RequestPermissions([PermissionAccessCoarseLocation, PermissionAccessFineLocation],
+    PermissionsService.RequestPermissions([CoarseLocationPermission, FineLocationPermission],
        procedure(const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray)
        begin
-         if AGrantResults[0] = TPermissionStatus.Granted then
-           LocationSensor1.Active := Switch1.IsChecked
+         if (Length(AGrantResults) = 2) and ((AGrantResults[0] = TPermissionStatus.Granted) or (AGrantResults[1] = TPermissionStatus.Granted)) then
+           LocationSensor1.Active := True
          else
            Switch1.IsChecked := False;
        end,
        procedure (const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc)
-       var
-         RationaleMsg: string;
        begin
-         for var i := Low(APermissions) to High(APermissions) do
-         begin
-           if APermissions[i] = PermissionAccessCoarseLocation then
-             RationaleMsg := RationaleMsg + 'The app needs to access the CoarseLocation for defining location' + sLineBreak + sLineBreak
-           else if APermissions[i] = PermissionAccessFineLocation then
-             RationaleMsg := RationaleMsg + 'The app needs to access the FineLocation for defining location';
-         end;
-
-         TDialogService.ShowMessage(RationaleMsg, procedure(const AResult: TModalResult)
+         TDialogService.ShowMessage('The app requires access to the device''s location',
+           procedure(const AResult: TModalResult)
            begin
              APostRationaleProc;
            end);

@@ -9,7 +9,6 @@ object FlashLightForm: TFlashLightForm
   FormFactor.Height = 1016
   FormFactor.Orientations = [Portrait]
   FormFactor.Devices = [iPhone]
-  OnCreate = FormCreate
   DesignerMasterStyle = 3
   object ContainerLayout: TLayout
     Align = Client

@@ -39,7 +39,10 @@ type
     TSensorCategory.Biometric, TSensorCategory.Light, TSensorCategory.Scanner];
     cForm = '  %s =' + sLineBreak + '%30s        %3.5f ' + sLineBreak;
     cFormS = '  %s =' + sLineBreak + '%30s        %s ' + sLineBreak;
-    cLocationPermission = 'android.permission.ACCESS_FINE_LOCATION';
+{$IF Defined(ANDROID)}
+    CoarseLocationPermission = 'android.permission.ACCESS_COARSE_LOCATION';
+    FineLocationPermission = 'android.permission.ACCESS_FINE_LOCATION';
+{$ENDIF}
   private
     { Private declarations }
     FShowInfo: Boolean;
@@ -630,18 +633,20 @@ begin
     FActiveSensor := TCustomSensor(TListBoxItem(Sender).Data);
     if (FActiveSensor <> nil) and (not FActiveSensor.Started) then
     begin
+{$IF Defined(ANDROID)}
       if FActiveSensor.Category = TSensorCategory.Location then
       begin
-        PermissionsService.RequestPermissions([cLocationPermission],
+        PermissionsService.RequestPermissions([CoarseLocationPermission, FineLocationPermission],
           procedure(const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray)
           begin
-            if (Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted) then
+            if (Length(AGrantResults) = 2) and ((AGrantResults[0] = TPermissionStatus.Granted) or (AGrantResults[1] = TPermissionStatus.Granted)) then
               FActiveSensor.Start
             else
               TDialogService.ShowMessage('Location permission not granted');
           end)
       end
       else
+{$ENDIF}
         FActiveSensor.Start;
     end;
   end;

@@ -263,9 +263,7 @@ begin
                                      and (AGrantResults[1] = TPermissionStatus.Granted)
                                      and (AGrantResults[2] = TPermissionStatus.Granted)) or
          ((Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted)) then
-      begin
         DoScan;
-      end;
     end);
 {$ELSE}
   DoScan;

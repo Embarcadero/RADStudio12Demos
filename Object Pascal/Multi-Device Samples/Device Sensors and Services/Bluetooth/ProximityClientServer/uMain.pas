@@ -109,10 +109,8 @@ begin
       end);
   end
   else
-    StartAnnouncing;
-{$ELSE}
-  StartAnnouncing;
 {$ENDIF}
+    StartAnnouncing;
 end;
 
 procedure TForm4.StartAnnouncing;

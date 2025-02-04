@@ -29,15 +29,19 @@ type
     Camera: TCameraComponent;
     GlowEffect1: TGlowEffect;
     LayoutButtons: TLayout;
-    procedure FormCreate(Sender: TObject);
     procedure ImageOffClick(Sender: TObject);
     procedure ImageOnClick(Sender: TObject);
+{$IF Defined(ANDROID)}
+  private const
+    CameraPermission = 'android.permission.CAMERA';
+{$ENDIF}
   private
-    FPermissionCamera: string;
     procedure SetFlashlightState(Active: Boolean);
-    procedure AccessCameraPermissionRequestResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
+{$IF Defined(ANDROID)}
     procedure ActivateCameraPermissionRequestResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
     procedure DisplayRationale(Sender: TObject; const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc);
+{$ENDIF}
+    procedure SetFlashlightOn;
   public
     { Public declarations }
   end;
@@ -48,11 +52,6 @@ var
 implementation
 
 uses
-{$IFDEF ANDROID}
-  Androidapi.Helpers,
-  Androidapi.JNI.JavaTypes,
-  Androidapi.JNI.Os,
-{$ENDIF}
   FMX.DialogService;
 
 {$R *.fmx}
@@ -66,26 +65,12 @@ begin
     Camera.TorchMode := TTorchMode.ModeOff;
 end;
 
-procedure TFlashLightForm.AccessCameraPermissionRequestResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
-begin
-  // 1 permission involved: CAMERA
-  if (Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted) then
-    ImageOff.Enabled := Camera.HasFlash
-  else
-    TDialogService.ShowMessage('Cannot access the camera flashlight because the required permission has not been granted');
-end;
-
+{$IF Defined(ANDROID)}
 procedure TFlashLightForm.ActivateCameraPermissionRequestResult(Sender: TObject; const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray);
 begin
   // 1 permission involved: CAMERA
   if (Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted) then
-  begin
-    Camera.Active := True;
-    ImageOff.Visible := False;
-    ImageOn.Visible := True;
-    SetFlashlightState(True);
-    Light.Visible := True;
-  end
+    SetFlashlightOn
   else
     TDialogService.ShowMessage('Cannot access the camera flashlight because the required permission has not been granted');
 end;
@@ -101,18 +86,33 @@ begin
       APostRationaleProc;
     end)
 end;
-
-procedure TFlashLightForm.FormCreate(Sender: TObject);
-begin
-{$IFDEF ANDROID}
-  FPermissionCamera := JStringToString(TJManifest_permission.JavaClass.CAMERA);
 {$ENDIF}
-  PermissionsService.RequestPermissions([FPermissionCamera], AccessCameraPermissionRequestResult, DisplayRationale);
-end;
 
 procedure TFlashLightForm.ImageOffClick(Sender: TObject);
 begin
-  PermissionsService.RequestPermissions([FPermissionCamera], ActivateCameraPermissionRequestResult, DisplayRationale);
+{$IF Defined(ANDROID)}
+  PermissionsService.RequestPermissions([CameraPermission], ActivateCameraPermissionRequestResult, DisplayRationale);
+{$ELSE}
+  SetFlashlightOn;
+{$ENDIF}
+end;
+
+procedure TFlashLightForm.SetFlashlightOn;
+begin
+  if Camera.HasFlash then
+  begin
+    Camera.Active := True;
+    ImageOff.Visible := False;
+    ImageOn.Visible := True;
+    SetFlashlightState(True);
+    Light.Visible := True;
+  end
+  else
+  begin
+    ImageOff.Enabled := False;
+
+    TDialogService.ShowMessage('Cannot turn the camera flashlight on');
+  end;
 end;
 
 procedure TFlashLightForm.ImageOnClick(Sender: TObject);
