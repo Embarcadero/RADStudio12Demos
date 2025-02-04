@@ -63,7 +63,7 @@ procedure TLocationTrackingForm.ButtonStartLocationTrackingClick(Sender: TObject
 begin
   // Tracking the user's location requires either the 'ACCESS_COARSE_LOCATION' dangerous permission or the 'ACCESS_FINE_LOCATION'
   // one to be granted at runtime.
-  TPermissionsService.DefaultService.RequestPermissions(
+  PermissionsService.RequestPermissions(
     [JStringToString(TJManifest_permission.JavaClass.ACCESS_COARSE_LOCATION), JStringToString(TJManifest_permission.JavaClass.ACCESS_FINE_LOCATION)],
     procedure(const Permissions: TClassicStringDynArray; const GrantResults: TClassicPermissionStatusDynArray)
     begin

@@ -53,7 +53,7 @@ uses
 
 procedure TForm1.Button1Click(Sender: TObject);
 begin
-  TPermissionsService.DefaultService.RequestPermissions(['android.permission.WRITE_EXTERNAL_STORAGE'],
+  PermissionsService.RequestPermissions(['android.permission.WRITE_EXTERNAL_STORAGE'],
     procedure(const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray)
     var
       LIntentService: TIntentServiceHelper;

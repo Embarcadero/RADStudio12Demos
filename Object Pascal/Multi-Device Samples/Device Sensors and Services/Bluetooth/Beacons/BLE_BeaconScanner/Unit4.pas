@@ -99,10 +99,10 @@ begin
   else
     Permissions := [LOCATION_PERMISSION];
 
-  if PermissionsService.DefaultService.IsEveryPermissionGranted(Permissions) then
+  if PermissionsService.IsEveryPermissionGranted(Permissions) then
     FManager.StartDiscovery(DISCOVERY_TIMEOUT)
   else
-    PermissionsService.DefaultService.RequestPermissions(Permissions,
+    PermissionsService.RequestPermissions(Permissions,
       procedure(const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray)
       begin
         if ((Length(AGrantResults) = 3) and (AGrantResults[0] = TPermissionStatus.Granted)

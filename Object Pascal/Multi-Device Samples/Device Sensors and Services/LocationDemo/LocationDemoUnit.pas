@@ -78,7 +78,7 @@ begin
     var PermissionAccessCoarseLocation := JStringToString(TJManifest_permission.JavaClass.ACCESS_COARSE_LOCATION);
     var PermissionAccessFineLocation := JStringToString(TJManifest_permission.JavaClass.ACCESS_FINE_LOCATION);
 
-    TPermissionsService.DefaultService.RequestPermissions([PermissionAccessCoarseLocation, PermissionAccessFineLocation],
+    PermissionsService.RequestPermissions([PermissionAccessCoarseLocation, PermissionAccessFineLocation],
        procedure(const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray)
        begin
          if AGrantResults[0] = TPermissionStatus.Granted then
