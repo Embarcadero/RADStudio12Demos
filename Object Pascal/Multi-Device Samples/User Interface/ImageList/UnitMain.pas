@@ -217,7 +217,7 @@ end;
 
 destructor TMainForm.Destroy;
 begin
-  FImageLink.DisposeOf;
+  FImageLink.Free;
   inherited;
 end;
 
