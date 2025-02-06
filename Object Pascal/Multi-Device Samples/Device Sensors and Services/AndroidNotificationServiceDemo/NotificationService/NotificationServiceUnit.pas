@@ -28,7 +28,6 @@ type
     function AndroidServiceStartCommand(const Sender: TObject; const Intent: JIntent; Flags, StartId: Integer): Integer;
   private
     { Private declarations }
-    FThread: TThread;
     procedure LaunchNotification;
   public
     { Public declarations }

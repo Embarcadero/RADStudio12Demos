@@ -18,7 +18,7 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Controls.Presentation, FMX.StdCtrls,
-  System.Notification, FMX.ScrollBox, FMX.Memo;
+  System.Notification, FMX.ScrollBox, FMX.Memo, FMX.Memo.Types;
 
 type
   TForm1 = class(TForm)
@@ -28,10 +28,8 @@ type
     Label1: TLabel;
     procedure Button1Click(Sender: TObject);
     procedure NotificationCenter1ReceiveLocalNotification(Sender: TObject; ANotification: TNotification);
-  private
-    { Private declarations }
-  public
-    { Public declarations }
+  private const
+    ServiceName = 'NotificationService';
   end;
 
 var
@@ -42,11 +40,31 @@ implementation
 {$R *.fmx}
 
 uses
-  System.Android.Service;
+  System.Android.Service, System.Permissions,
+  Androidapi.Helpers, Androidapi.JNI.JavaTypes, Androidapi.JNI.OS,
+  FMX.DialogService;
 
 procedure TForm1.Button1Click(Sender: TObject);
 begin
-  TLocalServiceConnection.StartService('NotificationService');
+  if TOSVersion.Check(13, 0) then
+  begin
+    PermissionsService.RequestPermissions([JStringToString(TJManifest_permission.JavaClass.POST_NOTIFICATIONS)],
+      procedure(const APermissions: TClassicStringDynArray; const AGrantResults: TClassicPermissionStatusDynArray)
+      begin
+        if (Length(AGrantResults) = 1) and (AGrantResults[0] = TPermissionStatus.Granted) then
+          TLocalServiceConnection.StartService(ServiceName);
+      end,
+      procedure(const APermissions: TClassicStringDynArray; const APostRationaleProc: TProc)
+      begin
+        TDialogService.ShowMessage('The app needs permission to post notifications',
+          procedure(const AResult: TModalResult)
+          begin
+            APostRationaleProc;
+          end);
+      end);
+  end
+  else
+    TLocalServiceConnection.StartService(ServiceName);
 end;
 
 procedure TForm1.NotificationCenter1ReceiveLocalNotification(Sender: TObject; ANotification: TNotification);
